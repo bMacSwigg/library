@@ -1,5 +1,5 @@
-from models import Book
-from db import Database
+from backend.models import Book
+from backend.db import Database
 
 class BookService:
 
@@ -8,12 +8,16 @@ class BookService:
     def __init__(self):
         self.db = Database(self.DB_FILE)
 
-    def getBook(self, isbn: str) -> Book:
-        vals = self.db.get(isbn)
+    def _bookFromTuple(self, vals: tuple) -> Book:
         return Book(vals[0], vals[1], vals[2])
 
+    def getBook(self, isbn: str) -> Book:
+        vals = self.db.get(isbn)
+        return self._bookFromTuple(vals)
+
     def listBooks(self) -> list[Book]:
-        pass
+        vals = self.db.list()
+        return [self._bookFromTuple(val) for val in vals]
 
     def importBook(self, isbn: str):
         # TODO: look up ISBN for metadata
