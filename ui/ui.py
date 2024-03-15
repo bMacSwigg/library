@@ -43,23 +43,23 @@ class ImportTab(_BaseTab):
         self.bs.createBook(book)
 
     def _make(self):
+        isbn = StringVar()
+        isbnLabel = ttk.Label(self.tab, text="ISBN:")
+        isbnLabel.grid(column=0, row=0)
+        isbnEntry = ttk.Entry(self.tab, width=20, textvariable=isbn)
+        isbnEntry.grid(column=1, row=0)
+
         title = StringVar()
         titleLabel = ttk.Label(self.tab, text="Title:")
-        titleLabel.grid(column=0, row=0)
+        titleLabel.grid(column=0, row=1)
         titleEntry = ttk.Entry(self.tab, width=20, textvariable=title)
-        titleEntry.grid(column=1, row=0)
+        titleEntry.grid(column=1, row=1)
 
         author = StringVar()
         authorLabel = ttk.Label(self.tab, text="Author:")
-        authorLabel.grid(column=0, row=1)
+        authorLabel.grid(column=0, row=2)
         authorEntry = ttk.Entry(self.tab, width=20, textvariable=author)
-        authorEntry.grid(column=1, row=1)
-
-        isbn = StringVar()
-        isbnLabel = ttk.Label(self.tab, text="ISBN:")
-        isbnLabel.grid(column=0, row=2)
-        isbnEntry = ttk.Entry(self.tab, width=20, textvariable=isbn)
-        isbnEntry.grid(column=1, row=2)
+        authorEntry.grid(column=1, row=2)
 
         create = ttk.Button(self.tab, text="Create",
                             command=lambda: self._createBook(isbn, title, author))
