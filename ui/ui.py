@@ -6,6 +6,8 @@ from tkinter import ttk
 from backend.api import BookService
 from backend.models import Book
 
+ERROR_STYLE = 'Error.TLabel'
+
 class _BaseTab:
 
     def __init__(self, tab, bs):
@@ -38,9 +40,26 @@ class CatalogTab(_BaseTab):
 
 class ImportTab(_BaseTab):
 
+    def _lookupBook(self, isbn):
+        print('TODO: lookup %s' % isbn.get())
+
     def _createBook(self, isbn, title, author):
-        book = Book(isbn.get(), title.get(), author.get())
-        self.bs.createBook(book)
+        i = isbn.get()
+        t = title.get()
+        a = author.get()
+        if i and t and a:
+            book = Book(i, t, a)
+            self.bs.createBook(book)
+            self.refresh()
+        else:
+            self._showError('Missing properties')
+
+    def _showError(self, msg):
+        if hasattr(self, 'error') and self.error.winfo_exists():
+            self.error.destroy()
+        self.error = ttk.Label(self.tab, text=('Error: %s' % msg))
+        self.error.configure(style=ERROR_STYLE)
+        self.error.grid(column=0, row=4, columnspan=2)
 
     def _make(self):
         isbn = StringVar()
@@ -48,6 +67,11 @@ class ImportTab(_BaseTab):
         isbnLabel.grid(column=0, row=0)
         isbnEntry = ttk.Entry(self.tab, width=20, textvariable=isbn)
         isbnEntry.grid(column=1, row=0)
+        isbnEntry.bind('<Return>', lambda e: self._lookupBook(isbn))
+
+        lookup = ttk.Button(self.tab, text="Lookup",
+                            command=lambda: self._lookupBook(isbn))
+        lookup.grid(column=2, row=0)
 
         title = StringVar()
         titleLabel = ttk.Label(self.tab, text="Title:")
@@ -79,6 +103,8 @@ class AppWindow:
         root = Tk()
         root.title('Brian\'s Library')
         root.geometry('600x400')
+
+        ttk.Style().configure(ERROR_STYLE, foreground='red')
 
         mainframe = ttk.Frame(root, padding="3 3 12 12")
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
