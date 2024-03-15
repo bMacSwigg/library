@@ -6,68 +6,94 @@ from tkinter import ttk
 from backend.api import BookService
 from backend.models import Book
 
-def getBooks() -> list[Book]:
-    # TODO: handle this dependency better
-    return BookService().listBooks()
+class _BaseTab:
 
-def makeBookRow(book: Book, ind: int, tab):
-    row = ttk.Frame(tab)
-    row.grid(column=0, row=ind, sticky=(W, E))
-    ttk.Label(row, text=('Title: %s' % book.title)).grid(column=0, row=0, sticky=W)
-    ttk.Label(row, text=('ISBN: %s' % book.isbn)).grid(column=1, row=0, sticky=E)
+    def __init__(self, tab, bs):
+        self.tab = tab
+        self.bs = bs
 
-def makeCatalog(tab):
-    books = getBooks()
-    for i,book in enumerate(books):
-        makeBookRow(book, i, tabCatalog)
+    def _make(self):
+        pass
 
-def createBook(isbn):
-    BookService().importBook(isbn.get())
+    def refresh(self):
+        for child in self.tab.winfo_children():
+            child.destroy()
+        self._make()
 
-def makeImport(tab):
-    title = StringVar()
-    titleLabel = ttk.Label(tab, text="Title:")
-    titleLabel.grid(column=0, row=0)
-    titleEntry = ttk.Entry(tab, width=20, textvariable=title)
-    titleEntry.grid(column=1, row=0)
+class CatalogTab(_BaseTab):
 
-    author = StringVar()
-    authorLabel = ttk.Label(tab, text="Author:")
-    authorLabel.grid(column=0, row=1)
-    authorEntry = ttk.Entry(tab, width=20, textvariable=author)
-    authorEntry.grid(column=1, row=1)
+    def _getBooks(self) -> list[Book]:
+        return self.bs.listBooks()
 
-    isbn = StringVar()
-    isbnLabel = ttk.Label(tab, text="ISBN:")
-    isbnLabel.grid(column=0, row=2)
-    isbnEntry = ttk.Entry(tab, width=20, textvariable=isbn)
-    isbnEntry.grid(column=1, row=2)
+    def _makeBookRow(self, book: Book, ind: int):
+        row = ttk.Frame(self.tab)
+        row.grid(column=0, row=ind, sticky=(W, E))
+        ttk.Label(row, text=('Title: %s' % book.title)).grid(column=0, row=0, sticky=W)
+        ttk.Label(row, text=('ISBN: %s' % book.isbn)).grid(column=1, row=0, sticky=E)
 
-    create = ttk.Button(tab, text="Create", command=lambda: createBook(isbn))
-    create.grid(column=0, row=3, columnspan=2)
+    def _make(self):
+        books = self._getBooks()
+        for i,book in enumerate(books):
+            self._makeBookRow(book, i)
 
+class ImportTab(_BaseTab):
+
+    def _createBook(self, isbn):
+        self.bs.importBook(isbn.get())
+
+    def _make(self):
+        title = StringVar()
+        titleLabel = ttk.Label(self.tab, text="Title:")
+        titleLabel.grid(column=0, row=0)
+        titleEntry = ttk.Entry(self.tab, width=20, textvariable=title)
+        titleEntry.grid(column=1, row=0)
+
+        author = StringVar()
+        authorLabel = ttk.Label(self.tab, text="Author:")
+        authorLabel.grid(column=0, row=1)
+        authorEntry = ttk.Entry(self.tab, width=20, textvariable=author)
+        authorEntry.grid(column=1, row=1)
+
+        isbn = StringVar()
+        isbnLabel = ttk.Label(self.tab, text="ISBN:")
+        isbnLabel.grid(column=0, row=2)
+        isbnEntry = ttk.Entry(self.tab, width=20, textvariable=isbn)
+        isbnEntry.grid(column=1, row=2)
+
+        create = ttk.Button(self.tab, text="Create",
+                            command=lambda: self._createBook(isbn))
+        create.grid(column=0, row=3, columnspan=2)
     
+class AppWindow:
 
-root = Tk()
-root.title('Brian\'s Library')
-root.geometry('600x400')
+    def __init__(self):
+        self.bs = BookService()
 
-mainframe = ttk.Frame(root, padding="3 3 12 12")
-mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
+    def main(self):
+        root = Tk()
+        root.title('Brian\'s Library')
+        root.geometry('600x400')
 
-tabs = ttk.Notebook(mainframe)
-tabCatalog = ttk.Frame(tabs)
-tabCheckout = ttk.Frame(tabs)
-tabImport = ttk.Frame(tabs)
-tabs.add(tabCatalog, text='Catalog')
-tabs.add(tabCheckout, text='Checkout')
-tabs.add(tabImport, text='Import')
-tabs.pack(expand=1, fill='both')
+        mainframe = ttk.Frame(root, padding="3 3 12 12")
+        mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+        root.columnconfigure(0, weight=1)
+        root.rowconfigure(0, weight=1)
 
-makeCatalog(tabCatalog)
-makeImport(tabImport)
+        tabs = ttk.Notebook(mainframe)
+        tabCatalog = ttk.Frame(tabs)
+        tabCheckout = ttk.Frame(tabs)
+        tabImport = ttk.Frame(tabs)
+        tabs.add(tabCatalog, text='Catalog')
+        tabs.add(tabCheckout, text='Checkout')
+        tabs.add(tabImport, text='Import')
+        tabs.pack(expand=1, fill='both')
 
+        self.catalogTab = CatalogTab(tabCatalog, self.bs)
+        self.catalogTab.refresh()
+        self.importTab = ImportTab(tabImport, self.bs)
+        self.importTab.refresh()
 
-root.mainloop()
+        root.mainloop()
+
+if __name__ == '__main__':
+    AppWindow().main()
