@@ -36,3 +36,8 @@ class Database:
                  (self.BOOKS_TABLENAME, isbn, title))
         cur.execute(query)
         self.con.commit()
+
+    def list(self):
+        cur = self.con.cursor()
+        query = 'SELECT * FROM %s' % self.BOOKS_TABLENAME
+        return cur.execute(query).fetchall()

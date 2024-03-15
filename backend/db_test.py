@@ -24,6 +24,15 @@ class TestDatabase(unittest.TestCase):
 
         self.assertEqual(res, ('some-isbn', 'Really Cool Book'))
 
+    def test_list(self):
+        self.db.initTables()
+        self.db.put('isbn1', 'Babel')
+        self.db.put('isbn2', 'Looking for Alaska')
+
+        res = self.db.list()
+
+        self.assertEqual(res, [('isbn1', 'Babel'), ('isbn2', 'Looking for Alaska')])
+
 
 if __name__ == '__main__':
     unittest.main()
