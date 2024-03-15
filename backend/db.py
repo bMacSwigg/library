@@ -9,11 +9,20 @@ class Database:
         self.con = sqlite3.connect(filename)
 
     def __del__(self):
+        self.close()
+
+    def close(self):
         self.con.close()
 
-    def initializeBooksTables(self):
+    def initTables(self):
+        """Checks if the necessary tables exist, and if not, creates them."""
         cur = self.con.cursor()
-        cur.execute('CREATE TABLE %s(Isbn, Title)' % self.BOOKS_TABLENAME)
+        booksQuery = ('SELECT name FROM sqlite_master WHERE name="%s"' %
+                      self.BOOKS_TABLENAME)
+        if cur.execute(booksQuery).fetchone() is None:
+            cur.execute('CREATE TABLE %s(Isbn, Title)' % self.BOOKS_TABLENAME)
+        else:
+            print('Table %s already exists' % self.BOOKS_TABLENAME)
 
     def get(self, isbn):
         cur = self.con.cursor()
