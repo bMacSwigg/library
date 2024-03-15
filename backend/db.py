@@ -1,12 +1,16 @@
+import logging
 import sqlite3
 
 class Database:
 
     BOOKS_TABLENAME = 'Books'
+    LOGS_TABLENAME = 'CheckoutLogs'
 
     def __init__(self, filename):
         self.filename = filename
         self.con = sqlite3.connect(filename)
+        self.logger = logging.getLogger('db_logger')
+        logging.basicConfig(level=logging.WARNING)
 
     def __del__(self):
         self.close()
@@ -14,15 +18,16 @@ class Database:
     def close(self):
         self.con.close()
 
-    def initTables(self):
-        """Checks if the necessary tables exist, and if not, creates them."""
+    def check(self):
+        """Checks if the necessary tables exist."""
         cur = self.con.cursor()
-        booksQuery = ('SELECT name FROM sqlite_master WHERE name="%s"' %
-                      self.BOOKS_TABLENAME)
-        if cur.execute(booksQuery).fetchone() is None:
-            cur.execute('CREATE TABLE %s(Isbn, Title)' % self.BOOKS_TABLENAME)
-        else:
-            print('Table %s already exists' % self.BOOKS_TABLENAME)
+        tables = cur.execute('SELECT name FROM sqlite_schema').fetchall()
+        self._findTable(self.BOOKS_TABLENAME, tables)
+        self._findTable(self.LOGS_TABLENAME, tables)
+
+    def _findTable(self, tablename, tables):
+        if (tablename,) not in tables:
+            self.logger.warning('Table %s does not exist' % tablename)
 
     def get(self, isbn):
         cur = self.con.cursor()

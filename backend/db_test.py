@@ -7,25 +7,33 @@ class TestDatabase(unittest.TestCase):
 
     def setUp(self):
         self.db = Database(self.TEST_DATABASE)
+        with open('books.schema', 'r') as file:
+            schema = file.read()
+            self.db.con.cursor().executescript(schema)
 
     def tearDown(self):
         self.db.close()
 
-    def test_initTables_tableAlreadyExists(self):
-        self.db.initTables()
+    def test_check_tablesExist(self):
+        with self.assertNoLogs('db_logger', level='WARNING') as lc:
+            self.db.check()
 
-        self.db.initTables()  # Second call does not raise an error
+    def test_check_tablesMissing(self):
+        self.db.con.cursor().execute('DROP TABLE Books')
+        self.db.con.cursor().execute('DROP TABLE CheckoutLogs')
+        with self.assertLogs('db_logger', level='WARNING') as lc:
+            self.db.check()
+            self.assertEqual(lc.output,
+                             ['WARNING:db_logger:Table Books does not exist',
+                              'WARNING:db_logger:Table CheckoutLogs does not exist'])
 
     def test_putAndGet(self):
-        self.db.initTables()
-
         self.db.put('some-isbn', 'Really Cool Book')
         res = self.db.get('some-isbn')
 
         self.assertEqual(res, ('some-isbn', 'Really Cool Book'))
 
     def test_list(self):
-        self.db.initTables()
         self.db.put('isbn1', 'Babel')
         self.db.put('isbn2', 'Looking for Alaska')
 

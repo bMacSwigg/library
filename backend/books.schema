@@ -1,0 +1,14 @@
+CREATE TABLE Books(
+  Isbn TEXT PRIMARY KEY,
+  Title TEXT
+);
+
+CREATE TABLE CheckoutLogs(
+  Isbn TEXT,
+  Timestamp TEXT,
+  Action INTEGER,
+  User TEXT
+);
+
+CREATE UNIQUE INDEX LogsByTimestamp
+ON CheckoutLogs(Isbn, Timestamp DESC);
