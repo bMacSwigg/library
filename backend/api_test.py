@@ -36,6 +36,14 @@ class TestBookService(unittest.TestCase):
                          [Book('isbn1', 'Babel', 'R.F. Kuang'),
                           Book('isbn2', 'Looking For Alaska', 'John Green')])
 
+    def test_createBook(self):
+        book = Book('isbn1', 'Paul', 'Andrea Lawler')
+
+        self.books.createBook(book)
+        res = self.books.getBook('isbn1')
+
+        self.assertEqual(res, book)
+
 
 if __name__ == '__main__':
     unittest.main()

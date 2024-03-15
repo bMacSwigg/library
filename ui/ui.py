@@ -38,8 +38,9 @@ class CatalogTab(_BaseTab):
 
 class ImportTab(_BaseTab):
 
-    def _createBook(self, isbn):
-        self.bs.importBook(isbn.get())
+    def _createBook(self, isbn, title, author):
+        book = Book(isbn.get(), title.get(), author.get())
+        self.bs.createBook(book)
 
     def _make(self):
         title = StringVar()
@@ -61,7 +62,7 @@ class ImportTab(_BaseTab):
         isbnEntry.grid(column=1, row=2)
 
         create = ttk.Button(self.tab, text="Create",
-                            command=lambda: self._createBook(isbn))
+                            command=lambda: self._createBook(isbn, title, author))
         create.grid(column=0, row=3, columnspan=2)
     
 class AppWindow:

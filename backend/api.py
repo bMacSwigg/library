@@ -20,7 +20,6 @@ class BookService:
         vals = self.db.list()
         return [self._bookFromTuple(val) for val in vals]
 
-    def importBook(self, isbn: str):
-        # TODO: look up ISBN for metadata
-        self.db.put(isbn, 'filler-title', 'filler-author')
+    def createBook(self, book: Book):
+        self.db.put(book.isbn, book.title, book.author)
 
