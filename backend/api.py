@@ -3,7 +3,8 @@ from backend.db import Database
 
 class BookService:
 
-    DB_FILE = 'books.db'
+    # TODO: Move this into a settings file or something
+    DB_FILE = 'C:\\Users\\User\\Documents\\GitHub\\library\\backend\\books.db'
 
     def __init__(self):
         self.db = Database(self.DB_FILE)
@@ -21,5 +22,5 @@ class BookService:
 
     def importBook(self, isbn: str):
         # TODO: look up ISBN for metadata
-        self.db.put(isbn, 'filler-title')
+        self.db.put(isbn, 'filler-title', 'filler-author')
 

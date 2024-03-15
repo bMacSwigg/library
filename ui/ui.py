@@ -3,10 +3,12 @@
 from tkinter import *
 from tkinter import ttk
 
+from backend.api import BookService
 from backend.models import Book
 
 def getBooks() -> list[Book]:
-    return [Book('1234', 'Paul'), Book('5678', 'Babel')]
+    # TODO: handle this dependency better
+    return BookService().listBooks()
 
 def makeBookRow(book: Book, ind: int, tab):
     row = ttk.Frame(tab)
