@@ -100,6 +100,3 @@ class AppWindow:
         self.importTab.refresh()
 
         root.mainloop()
-
-if __name__ == '__main__':
-    AppWindow().main()
