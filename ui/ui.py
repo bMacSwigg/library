@@ -69,6 +69,11 @@ class AppWindow:
     def __init__(self):
         self.bs = BookService()
 
+    def refreshAllTabs(self, event):
+        # TODO: Would be better to just figure out which tab was picked
+        self.catalogTab.refresh()
+        self.importTab.refresh()
+
     def main(self):
         root = Tk()
         root.title('Brian\'s Library')
@@ -87,6 +92,7 @@ class AppWindow:
         tabs.add(tabCheckout, text='Checkout')
         tabs.add(tabImport, text='Import')
         tabs.pack(expand=1, fill='both')
+        tabs.bind('<<NotebookTabChanged>>', self.refreshAllTabs)
 
         self.catalogTab = CatalogTab(tabCatalog, self.bs)
         self.catalogTab.refresh()
