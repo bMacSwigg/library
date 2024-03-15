@@ -7,6 +7,7 @@ from backend.api import BookService
 from backend.models import Book
 
 ERROR_STYLE = 'Error.TLabel'
+TITLE_STYLE = 'Title.TLabel'
 
 class _BaseTab:
 
@@ -30,8 +31,11 @@ class CatalogTab(_BaseTab):
     def _makeBookRow(self, book: Book, ind: int):
         row = ttk.Frame(self.tab)
         row.grid(column=0, row=ind, sticky=(W, E))
-        ttk.Label(row, text=('Title: %s' % book.title)).grid(column=0, row=0, sticky=W)
-        ttk.Label(row, text=('ISBN: %s' % book.isbn)).grid(column=1, row=0, sticky=E)
+        title = ttk.Label(row, text=book.title)
+        title.grid(column=1, row=0, columnspan=2, sticky=W)
+        title.configure(style=TITLE_STYLE)
+        ttk.Label(row, text=book.author).grid(column=1, row=1, sticky=W)
+        ttk.Label(row, text=('ISBN: %s' % book.isbn)).grid(column=2, row=1, sticky=E)
 
     def _make(self):
         books = self._getBooks()
@@ -105,6 +109,7 @@ class AppWindow:
         root.geometry('600x400')
 
         ttk.Style().configure(ERROR_STYLE, foreground='red')
+        ttk.Style().configure(TITLE_STYLE, font=('Arial', 14, 'bold'))
 
         mainframe = ttk.Frame(root, padding="3 3 12 12")
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
