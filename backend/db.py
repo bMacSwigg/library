@@ -35,10 +35,10 @@ class Database:
                  (self.BOOKS_TABLENAME, isbn))
         return cur.execute(query).fetchone()
 
-    def put(self, isbn, title):
+    def put(self, isbn, title, author):
         cur = self.con.cursor()
-        query = ('INSERT INTO %s VALUES ("%s", "%s")' %
-                 (self.BOOKS_TABLENAME, isbn, title))
+        query = ('INSERT INTO %s VALUES ("%s", "%s", "%s")' %
+                 (self.BOOKS_TABLENAME, isbn, title, author))
         cur.execute(query)
         self.con.commit()
 

@@ -10,7 +10,7 @@ class BookService:
 
     def getBook(self, isbn: str) -> Book:
         vals = self.db.get(isbn)
-        return Book(vals[0], vals[1])
+        return Book(vals[0], vals[1], vals[2])
 
     def listBooks(self) -> list[Book]:
         pass

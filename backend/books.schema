@@ -1,13 +1,14 @@
 CREATE TABLE Books(
-  Isbn TEXT PRIMARY KEY,
-  Title TEXT
+  Isbn   TEXT PRIMARY KEY,
+  Title  TEXT,
+  Author TEXT
 );
 
 CREATE TABLE CheckoutLogs(
-  Isbn TEXT,
+  Isbn      TEXT,
   Timestamp TEXT,
-  Action INTEGER,
-  User TEXT
+  Action    INTEGER,
+  User      TEXT
 );
 
 CREATE UNIQUE INDEX LogsByTimestamp

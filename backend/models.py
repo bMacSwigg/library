@@ -4,3 +4,4 @@ from dataclasses import dataclass, asdict
 class Book:
     isbn: str  # ISBN of this book, also serves as primary ID
     title: str  # Full title of this book
+    author: str  # Full name of the author
