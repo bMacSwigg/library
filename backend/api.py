@@ -13,7 +13,7 @@ class BookService:
         self.db = Database(self.DB_FILE)
 
     def _bookFromTuple(self, vals: tuple) -> Book:
-        return Book(vals[0], vals[1], vals[2])
+        return Book(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5])
 
     def getBook(self, isbn: str) -> Book:
         vals = self.db.get(isbn)
@@ -24,7 +24,8 @@ class BookService:
         return [self._bookFromTuple(val) for val in vals]
 
     def createBook(self, book: Book):
-        self.db.put(book.isbn, book.title, book.author)
+        self.db.put(book.isbn, book.title, book.author, book.category,
+                    book.year, book.thumbnail)
 
 class LookupService:
 
@@ -33,18 +34,15 @@ class LookupService:
     def lookupIsbn(self, isbn: str) -> Book:
         res = json.load(urlopen(self.GOOGLE_BOOKS_ENDPOINT % isbn))
         vals = res['items'][0]['volumeInfo']
-        title = vals['title']
-        author = ', '.join(vals['authors'])
-        print(self._extractVal(vals, 'mainCategory'))
-        print(self._extractVal(vals, 'categories'))
-        print(self._extractVal(vals, 'publishedDate'))
-        # Also imageLinks.thumbnail
-        return Book(isbn, title, author)
-
-    def _extractVal(self, vals, name):
-        return vals[name] if name in vals else ''
-
-ls = LookupService()
-print(ls.lookupIsbn('9781398515697'))
-print(ls.lookupIsbn('9780060853983'))
-        
+        title = vals['title'] if 'title' in vals else ''
+        authors = vals['authors'] if 'authors' in vals else []
+        author = ', '.join(authors)
+        if 'mainCategory' in vals:
+            category = vals['mainCategory']
+        elif 'categories' in vals and len(vals['categories']) > 0:
+            category = vals['categories'][0]
+        else:
+            category = ''
+        year = vals['publishedDate'][:4] if 'publishedDate' in vals else ''
+        thumbnail = vals['imageLinks']['thumbnail']  # Too annoying to do safely
+        return Book(isbn, title, author, category, year, thumbnail)

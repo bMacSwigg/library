@@ -1,7 +1,10 @@
 CREATE TABLE Books(
-  Isbn   TEXT PRIMARY KEY,
-  Title  TEXT,
-  Author TEXT
+  Isbn      TEXT PRIMARY KEY,
+  Title     TEXT,
+  Author    TEXT,
+  Category  TEXT,
+  Year      TEXT,
+  Thumbnail TEXT
 );
 
 CREATE TABLE CheckoutLogs(

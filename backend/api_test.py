@@ -15,11 +15,11 @@ class TestBookService(unittest.TestCase):
             self.books.db.con.cursor().executescript(schema)
 
     def test_getBook_exists(self):
-        self.books.db.put('isbn1', 'title', 'author')
+        self.books.db.put('isbn1', 'title', 'author', 'cat', 'year', 'img')
 
         book = self.books.getBook('isbn1')
 
-        self.assertEqual(book, Book('isbn1', 'title', 'author'))
+        self.assertEqual(book, Book('isbn1', 'title', 'author', 'cat', 'year', 'img'))
 
     def test_getBook_doesNotExist(self):
         with self.assertRaises(TypeError):
@@ -27,17 +27,17 @@ class TestBookService(unittest.TestCase):
             self.books.getBook('isbn1')
 
     def test_listBooks(self):
-        self.books.db.put('isbn1', 'Babel', 'R.F. Kuang')
-        self.books.db.put('isbn2', 'Looking For Alaska', 'John Green')
+        self.books.db.put('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
+        self.books.db.put('isbn2', 'Looking For Alaska', 'John Green', 'Fiction', '2005', 'url')
 
         books = self.books.listBooks()
 
         self.assertEqual(books,
-                         [Book('isbn1', 'Babel', 'R.F. Kuang'),
-                          Book('isbn2', 'Looking For Alaska', 'John Green')])
+                         [Book('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url'),
+                          Book('isbn2', 'Looking For Alaska', 'John Green', 'Fiction', '2005', 'url')])
 
     def test_createBook(self):
-        book = Book('isbn1', 'Paul', 'Andrea Lawler')
+        book = Book('isbn1', 'Paul', 'Andrea Lawler', 'Fiction', '2017', 'url')
 
         self.books.createBook(book)
         res = self.books.getBook('isbn1')

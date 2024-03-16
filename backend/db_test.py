@@ -28,20 +28,20 @@ class TestDatabase(unittest.TestCase):
                               'WARNING:db_logger:Table CheckoutLogs does not exist'])
 
     def test_putAndGet(self):
-        self.db.put('some-isbn', 'Really Cool Book', 'Smart Person')
+        self.db.put('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url')
         res = self.db.get('some-isbn')
 
-        self.assertEqual(res, ('some-isbn', 'Really Cool Book', 'Smart Person'))
+        self.assertEqual(res, ('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url'))
 
     def test_list(self):
-        self.db.put('isbn1', 'Babel', 'R.F. Kuang')
-        self.db.put('isbn2', 'Looking for Alaska', 'John Green')
+        self.db.put('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
+        self.db.put('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')
 
         res = self.db.list()
 
         self.assertEqual(res,
-                         [('isbn1', 'Babel', 'R.F. Kuang'),
-                          ('isbn2', 'Looking for Alaska', 'John Green')])
+                         [('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url'),
+                          ('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')])
 
 
 if __name__ == '__main__':
