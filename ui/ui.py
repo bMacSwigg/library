@@ -1,13 +1,31 @@
 # TODO: give this a better class structure
 
+import io
+import PIL.ImageTk
+import PIL.Image
 from tkinter import *
 from tkinter import ttk
+import urllib.request
 
 from backend.api import BookService, LookupService
 from backend.models import Book
+# Embarrassing for Tk that this needs a custom impl
+from ui.scrollable import ScrollFrame
 
 ERROR_STYLE = 'Error.TLabel'
 TITLE_STYLE = 'Title.TLabel'
+AUTHOR_STYLE = 'Author.TLabel'
+
+def imageFromUrl(url):
+    try:
+        with urllib.request.urlopen(url) as u:
+            data = u.read()
+        image = PIL.Image.open(io.BytesIO(data))
+    except ValueError as e:
+        # TODO: log the error and replace it with a default "error" img
+        print(e)
+        image = PIL.Image.new('RGB', (128,192), (0,0,0))
+    return PIL.ImageTk.PhotoImage(image)
 
 class _BaseTab:
 
@@ -25,19 +43,51 @@ class _BaseTab:
 
 class CatalogTab(_BaseTab):
 
+    def __init__(self, tab, bs):
+        super().__init__(tab, bs)
+        # Track references to ImageTk instances so they don't disappear
+        self.imgs = []
+
     def _getBooks(self) -> list[Book]:
         return self.bs.listBooks()
 
     def _makeBookRow(self, book: Book, ind: int):
-        row = ttk.Frame(self.tab)
+        row = ttk.Frame(self.booksframe)
         row.grid(column=0, row=ind, sticky=(W, E))
-        title = ttk.Label(row, text=book.title)
-        title.grid(column=1, row=0, columnspan=2, sticky=W)
+
+        imgFrame = ttk.Frame(row)
+        imgFrame.grid(column=0, row=0, sticky=(N, W))
+        img = imageFromUrl(book.thumbnail)
+        self.imgs.append(img)
+        imglabel = ttk.Label(imgFrame, image=img)
+        imglabel.grid(column=0, row=0, sticky=(N, W))
+
+        metadataFrame = ttk.Frame(row)
+        metadataFrame.grid(column=1, row=0, sticky=(N, W))
+        title = ttk.Label(metadataFrame, text=book.title)
+        title.grid(column=0, row=0, columnspan=2, sticky=(N, W))
         title.configure(style=TITLE_STYLE)
-        ttk.Label(row, text=book.author).grid(column=1, row=1, sticky=W)
-        ttk.Label(row, text=('ISBN: %s' % book.isbn)).grid(column=2, row=1, sticky=E)
+        author = ttk.Label(metadataFrame, text=book.author)
+        author.grid(column=0, row=1, sticky=W)
+        isbn = ttk.Label(metadataFrame, text=('ISBN: %s' % book.isbn))
+        isbn.grid(column=0, row=2, sticky=W)
+
+        actionFrame = ttk.Frame(row)
+        actionFrame.grid(column=2, row=0, sticky=E)
+        checkout = ttk.Button(actionFrame, text="Checkout")
+        checkout.grid(column=0, row=0)
+        ret = ttk.Button(actionFrame, text="Return")
+        ret.grid(column=0, row=1)
+
+    def refresh(self):
+        self.imgs = []
+        super().refresh()
 
     def _make(self):
+        scrollframe = ScrollFrame(self.tab)
+        scrollframe.pack(side='top', fill='both', expand=True)
+        self.booksframe = scrollframe.viewPort
+
         books = self._getBooks()
         for i,book in enumerate(books):
             self._makeBookRow(book, i)
@@ -130,6 +180,11 @@ class ImportTab(_BaseTab):
 
         create = ttk.Button(self.tab, text="Create", command=self._createBook)
         create.grid(column=0, row=6, columnspan=2)
+
+        image = PIL.Image.new('RGB', (128,256), (0,0,0))
+        self.imagetk = PIL.ImageTk.PhotoImage(image)
+        imglab = ttk.Label(self.tab, image=self.imagetk)
+        imglab.grid(column=0, row=7)
     
 class AppWindow:
 
@@ -149,6 +204,7 @@ class AppWindow:
 
         ttk.Style().configure(ERROR_STYLE, foreground='red')
         ttk.Style().configure(TITLE_STYLE, font=('Arial', 14, 'bold'))
+        ttk.Style().configure(AUTHOR_STYLE, font=('Arial', 10, 'italic'))
 
         mainframe = ttk.Frame(root, padding="3 3 12 12")
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))

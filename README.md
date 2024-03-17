@@ -3,9 +3,16 @@ Personal library catalog
 
 ## Setup
 
-Add this project directory to the PYTHONPATH, to ensure imports work
+Add this project directory to the PYTHONPATH, to ensure imports work.
 
-To create a DB based off the schema (if one doesn't already exist), run:
+Install PIL, which is needed for displaying images:
+
+```
+pip install Pillow
+```
+
+To create a DB based off the schema (if one doesn't already exist), use the
+SQLite CLI to run:
 
 ```
 sqlite3 books.db < books.schema
