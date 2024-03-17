@@ -6,6 +6,7 @@
 # On March 17, 2024
 
 import tkinter as tk
+from tkinter import ttk
 import platform
 
 # ************************
@@ -16,8 +17,8 @@ class ScrollFrame(tk.Frame):
         super().__init__(parent) # create a frame (self)
 
         self.canvas = tk.Canvas(self, borderwidth=0, background="#ffffff")          #place canvas on self
-        self.viewPort = tk.Frame(self.canvas, background="#ffffff")                    #place a frame on the canvas, this frame will hold the child widgets 
-        self.vsb = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview) #place a scrollbar on self 
+        self.viewPort = ttk.Frame(self.canvas)                    #place a frame on the canvas, this frame will hold the child widgets 
+        self.vsb = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview) #place a scrollbar on self 
         self.canvas.configure(yscrollcommand=self.vsb.set)                          #attach scrollbar action to scroll of canvas
 
         self.vsb.pack(side="right", fill="y")                                       #pack scrollbar to right of self
