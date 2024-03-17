@@ -15,6 +15,7 @@ from ui.scrollable import ScrollFrame
 ERROR_STYLE = 'Error.TLabel'
 TITLE_STYLE = 'Title.TLabel'
 AUTHOR_STYLE = 'Author.TLabel'
+METADATA_STYLE = 'Metadta.TLabel'
 
 def imageFromUrl(url):
     try:
@@ -52,28 +53,30 @@ class CatalogTab(_BaseTab):
         return self.bs.listBooks()
 
     def _makeBookRow(self, book: Book, ind: int):
-        row = ttk.Frame(self.booksframe)
-        row.grid(column=0, row=ind, sticky=(W, E))
-
-        imgFrame = ttk.Frame(row)
-        imgFrame.grid(column=0, row=0, sticky=(N, W))
+        imgFrame = ttk.Frame(self.booksframe)
+        imgFrame.grid(column=0, row=ind, sticky=(N, W))
         img = imageFromUrl(book.thumbnail)
         self.imgs.append(img)
         imglabel = ttk.Label(imgFrame, image=img)
         imglabel.grid(column=0, row=0, sticky=(N, W))
 
-        metadataFrame = ttk.Frame(row)
-        metadataFrame.grid(column=1, row=0, sticky=(N, W))
+        metadataFrame = ttk.Frame(self.booksframe)
+        metadataFrame.grid(column=1, row=ind, sticky=(N, W))
         title = ttk.Label(metadataFrame, text=book.title)
         title.grid(column=0, row=0, columnspan=2, sticky=(N, W))
         title.configure(style=TITLE_STYLE)
         author = ttk.Label(metadataFrame, text=book.author)
         author.grid(column=0, row=1, sticky=W)
+        author.configure(style=AUTHOR_STYLE)
+        year = ttk.Label(metadataFrame, text=book.year)
+        year.grid(column=1, row=1, sticky=W, padx=4)
+        year.configure(style=METADATA_STYLE)
         isbn = ttk.Label(metadataFrame, text=('ISBN: %s' % book.isbn))
-        isbn.grid(column=0, row=2, sticky=W)
+        isbn.grid(column=0, row=2, columnspan=2, sticky=W)
+        isbn.configure(style=METADATA_STYLE)
 
-        actionFrame = ttk.Frame(row)
-        actionFrame.grid(column=2, row=0, sticky=E)
+        actionFrame = ttk.Frame(self.booksframe)
+        actionFrame.grid(column=2, row=ind, sticky=E)
         checkout = ttk.Button(actionFrame, text="Checkout")
         checkout.grid(column=0, row=0)
         ret = ttk.Button(actionFrame, text="Return")
@@ -205,6 +208,7 @@ class AppWindow:
         ttk.Style().configure(ERROR_STYLE, foreground='red')
         ttk.Style().configure(TITLE_STYLE, font=('Arial', 14, 'bold'))
         ttk.Style().configure(AUTHOR_STYLE, font=('Arial', 10, 'italic'))
+        ttk.Style().configure(METADATA_STYLE, font=('Arial', 10))
 
         mainframe = ttk.Frame(root, padding="3 3 12 12")
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
