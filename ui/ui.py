@@ -183,11 +183,6 @@ class ImportTab(_BaseTab):
 
         create = ttk.Button(self.tab, text="Create", command=self._createBook)
         create.grid(column=0, row=6, columnspan=2)
-
-        image = PIL.Image.new('RGB', (128,256), (0,0,0))
-        self.imagetk = PIL.ImageTk.PhotoImage(image)
-        imglab = ttk.Label(self.tab, image=self.imagetk)
-        imglab.grid(column=0, row=7)
     
 class AppWindow:
 
