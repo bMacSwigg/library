@@ -20,24 +20,24 @@ class TestDatabase(unittest.TestCase):
 
     def test_check_tablesMissing(self):
         self.db.con.cursor().execute('DROP TABLE Books')
-        self.db.con.cursor().execute('DROP TABLE CheckoutLogs')
+        self.db.con.cursor().execute('DROP TABLE ActionLogs')
         with self.assertLogs('db_logger', level='WARNING') as lc:
             self.db.check()
             self.assertEqual(lc.output,
                              ['WARNING:db_logger:Table Books does not exist',
-                              'WARNING:db_logger:Table CheckoutLogs does not exist'])
+                              'WARNING:db_logger:Table ActionLogs does not exist'])
 
     def test_putAndGet(self):
-        self.db.put('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url')
-        res = self.db.get('some-isbn')
+        self.db.putBook('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url')
+        res = self.db.getBook('some-isbn')
 
         self.assertEqual(res, ('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url'))
 
     def test_list(self):
-        self.db.put('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
-        self.db.put('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')
+        self.db.putBook('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
+        self.db.putBook('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')
 
-        res = self.db.list()
+        res = self.db.listBooks()
 
         self.assertEqual(res,
                          [('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url'),

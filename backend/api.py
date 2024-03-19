@@ -16,16 +16,17 @@ class BookService:
         return Book(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5])
 
     def getBook(self, isbn: str) -> Book:
-        vals = self.db.get(isbn)
+        vals = self.db.getBook(isbn)
         return self._bookFromTuple(vals)
 
     def listBooks(self) -> list[Book]:
-        vals = self.db.list()
+        vals = self.db.listBooks()
         return [self._bookFromTuple(val) for val in vals]
 
     def createBook(self, book: Book):
-        self.db.put(book.isbn, book.title, book.author, book.category,
-                    book.year, book.thumbnail)
+        self.db.putBook(book.isbn, book.title, book.author,
+                        book.category, book.year, book.thumbnail)
+        
 
 class LookupService:
 

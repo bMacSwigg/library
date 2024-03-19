@@ -7,7 +7,7 @@ CREATE TABLE Books(
   Thumbnail TEXT
 );
 
-CREATE TABLE CheckoutLogs(
+CREATE TABLE ActionLogs(
   Isbn      TEXT,
   Timestamp TEXT,
   Action    INTEGER,
@@ -15,4 +15,4 @@ CREATE TABLE CheckoutLogs(
 );
 
 CREATE UNIQUE INDEX LogsByTimestamp
-ON CheckoutLogs(Isbn, Timestamp DESC);
+ON ActionLogs(Isbn, Timestamp DESC);

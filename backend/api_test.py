@@ -15,7 +15,7 @@ class TestBookService(unittest.TestCase):
             self.books.db.con.cursor().executescript(schema)
 
     def test_getBook_exists(self):
-        self.books.db.put('isbn1', 'title', 'author', 'cat', 'year', 'img')
+        self.books.db.putBook('isbn1', 'title', 'author', 'cat', 'year', 'img')
 
         book = self.books.getBook('isbn1')
 
@@ -27,8 +27,8 @@ class TestBookService(unittest.TestCase):
             self.books.getBook('isbn1')
 
     def test_listBooks(self):
-        self.books.db.put('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
-        self.books.db.put('isbn2', 'Looking For Alaska', 'John Green', 'Fiction', '2005', 'url')
+        self.books.db.putBook('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
+        self.books.db.putBook('isbn2', 'Looking For Alaska', 'John Green', 'Fiction', '2005', 'url')
 
         books = self.books.listBooks()
 

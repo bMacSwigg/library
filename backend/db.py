@@ -4,7 +4,7 @@ import sqlite3
 class Database:
 
     BOOKS_TABLENAME = 'Books'
-    LOGS_TABLENAME = 'CheckoutLogs'
+    LOGS_TABLENAME = 'ActionLogs'
 
     def __init__(self, filename):
         self.filename = filename
@@ -29,20 +29,20 @@ class Database:
         if (tablename,) not in tables:
             self.logger.warning('Table %s does not exist' % tablename)
 
-    def get(self, isbn):
+    def getBook(self, isbn):
         cur = self.con.cursor()
         query = ('SELECT * FROM %s WHERE Isbn="%s"' %
                  (self.BOOKS_TABLENAME, isbn))
         return cur.execute(query).fetchone()
 
-    def put(self, isbn, title, author, cat, year, img):
+    def putBook(self, isbn, title, author, cat, year, img):
         cur = self.con.cursor()
         query = ('INSERT INTO %s VALUES ("%s", "%s", "%s", "%s", "%s", "%s")' %
                  (self.BOOKS_TABLENAME, isbn, title, author, cat, year, img))
         cur.execute(query)
         self.con.commit()
 
-    def list(self):
+    def listBooks(self):
         cur = self.con.cursor()
         query = 'SELECT * FROM %s' % self.BOOKS_TABLENAME
         return cur.execute(query).fetchall()
