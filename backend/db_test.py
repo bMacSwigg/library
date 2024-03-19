@@ -1,5 +1,8 @@
 import unittest
-from backend.db import Database
+from datetime import datetime, UTC
+import time
+
+from backend.db import Action, Database
 
 class TestDatabase(unittest.TestCase):
 
@@ -42,6 +45,45 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(res,
                          [('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url'),
                           ('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')])
+
+    def test_logs_putAndGet(self):
+        self.db.putLog('some-isbn', Action.CREATE, 'brian')
+
+        res = self.db.getLatestLog('some-isbn')
+
+        self.assertEqual(res[0], 'some-isbn')
+        self.assertEqual(res[2], Action.CREATE.value)
+        self.assertEqual(res[3], 'brian')
+        # Check it's on the right date, since exact timestamps will differ
+        now = datetime.now(UTC).date()
+        logtime = datetime.fromisoformat(res[1]).date()
+        self.assertEqual(logtime, now)
+
+    def test_logs_getsMostRecent(self):
+        self.db.putLog('some-isbn', Action.CREATE, 'brian')
+        time.sleep(1)  # Hack to keep the timestamps from colliding
+        self.db.putLog('some-isbn', Action.CHECKOUT, 'friend')
+
+        res = self.db.getLatestLog('some-isbn')
+
+        self.assertEqual(res[0], 'some-isbn')
+        self.assertEqual(res[2], Action.CHECKOUT.value)
+        self.assertEqual(res[3], 'friend')
+
+    def test_logs_getsMatchingIsbn(self):
+        self.db.putLog('isbn1', Action.CREATE, 'brian')
+        self.db.putLog('isbn2', Action.CHECKOUT, 'friend')
+
+        res = self.db.getLatestLog('isbn1')
+
+        self.assertEqual(res[0], 'isbn1')
+        self.assertEqual(res[2], Action.CREATE.value)
+        self.assertEqual(res[3], 'brian')
+
+    def test_logs_noneMatching(self):
+        res = self.db.getLatestLog('isbn1')
+
+        self.assertIsNone(res)
 
 
 if __name__ == '__main__':
