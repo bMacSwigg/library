@@ -63,16 +63,16 @@ class CatalogTab(_BaseTab):
         metadataFrame = ttk.Frame(self.booksframe)
         metadataFrame.grid(column=1, row=ind, sticky=(N, W))
         title = ttk.Label(metadataFrame, text=book.title)
-        title.grid(column=0, row=0, columnspan=2, sticky=(N, W))
+        title.grid(column=0, row=0, sticky=(N, W))
         title.configure(style=TITLE_STYLE)
         author = ttk.Label(metadataFrame, text=book.author)
         author.grid(column=0, row=1, sticky=W)
         author.configure(style=AUTHOR_STYLE)
         year = ttk.Label(metadataFrame, text=book.year)
-        year.grid(column=1, row=1, sticky=W, padx=4)
+        year.grid(column=0, row=2, sticky=W)
         year.configure(style=METADATA_STYLE)
         isbn = ttk.Label(metadataFrame, text=('ISBN: %s' % book.isbn))
-        isbn.grid(column=0, row=2, columnspan=2, sticky=W)
+        isbn.grid(column=0, row=3, sticky=W)
         isbn.configure(style=METADATA_STYLE)
 
         actionFrame = ttk.Frame(self.booksframe)
@@ -146,6 +146,7 @@ class ImportTab(_BaseTab):
         isbnEntry = ttk.Entry(self.tab, width=20, textvariable=self.isbn)
         isbnEntry.grid(column=1, row=0)
         isbnEntry.bind('<Return>', lambda e: self._lookupBook())
+        isbnEntry.focus()
 
         lookup = ttk.Button(self.tab, text="Lookup",
                             command=self._lookupBook)
