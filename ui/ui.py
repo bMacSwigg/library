@@ -11,13 +11,10 @@ import urllib.request
 
 from backend.api import BookService, LookupService
 from backend.models import Book
+from constants import *
 # Embarrassing for Tk that this needs a custom impl
 from ui.scrollable import ScrollFrame
 
-ERROR_STYLE = 'Error.TLabel'
-TITLE_STYLE = 'Title.TLabel'
-AUTHOR_STYLE = 'Author.TLabel'
-METADATA_STYLE = 'Metadta.TLabel'
 
 def imageFromUrl(url):
     try:

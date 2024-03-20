@@ -3,14 +3,12 @@ from urllib.request import urlopen
 
 from backend.models import Book
 from backend.db import Action, Database
+from constants import *
 
 class BookService:
 
-    # TODO: Move this into a settings file or something
-    DB_FILE = 'C:\\Users\\User\\Documents\\GitHub\\library\\backend\\books.db'
-
     def __init__(self):
-        self.db = Database(self.DB_FILE)
+        self.db = Database(DB_FILE)
 
     def _bookFromTuple(self, book_vals: tuple, log_vals: tuple) -> Book:
         is_out = (log_vals[2] == Action.CHECKOUT.value)
