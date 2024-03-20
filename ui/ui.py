@@ -74,13 +74,22 @@ class CatalogTab(_BaseTab):
         isbn = ttk.Label(metadataFrame, text=('ISBN: %s' % book.isbn))
         isbn.grid(column=0, row=3, sticky=W)
         isbn.configure(style=METADATA_STYLE)
+        if book.is_out:
+            checkout_txt = ('Checked out by %s at %s' %
+                            (book.checkout_user, book.checkout_time))
+            checkout = ttk.Label(metadataFrame, text=checkout_txt)
+            checkout.grid(column=0, row=4, sticky=W, ipady=4)
+            checkout.grid(style=METADATA_STYLE)
 
         actionFrame = ttk.Frame(self.booksframe)
         actionFrame.grid(column=2, row=ind, sticky=E)
-        checkout = ttk.Button(actionFrame, text="Checkout")
-        checkout.grid(column=0, row=0)
-        ret = ttk.Button(actionFrame, text="Return")
-        ret.grid(column=0, row=1)
+        if book.is_out:
+            ret = ttk.Button(actionFrame, text="Return")
+            ret.grid(column=0, row=0)
+        else:
+            checkout = ttk.Button(actionFrame, text="Checkout")
+            checkout.grid(column=0, row=0)
+        
 
     def refresh(self):
         self.imgs = []
