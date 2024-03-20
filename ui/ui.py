@@ -5,6 +5,8 @@ import PIL.ImageTk
 import PIL.Image
 from tkinter import *
 from tkinter import ttk
+from tkinter.messagebox import askokcancel
+from tkinter.simpledialog import askstring
 import urllib.request
 
 from backend.api import BookService, LookupService
@@ -52,6 +54,22 @@ class CatalogTab(_BaseTab):
     def _getBooks(self) -> list[Book]:
         return self.bs.listBooks()
 
+    def _checkoutBook(self, isbn, title):
+        prompt = ('Who is checking out \'%s\'?' % title)
+        user = askstring('Checkout', prompt)
+        if user is not None:
+            self.bs.checkoutBook(isbn, user)
+            # TODO: Only refresh this book row
+            self.refresh()
+
+    def _returnBook(self, isbn, title):
+        prompt = ('Confirm: Return \'%s\'?' % title)
+        confirm = askokcancel('Return', prompt)
+        if confirm:
+            self.bs.returnBook(isbn)
+            # TODO: Only refresh this book row
+            self.refresh()
+
     def _makeBookRow(self, book: Book, ind: int):
         imgFrame = ttk.Frame(self.booksframe)
         imgFrame.grid(column=0, row=ind, sticky=(N, W))
@@ -84,12 +102,13 @@ class CatalogTab(_BaseTab):
         actionFrame = ttk.Frame(self.booksframe)
         actionFrame.grid(column=2, row=ind, sticky=E)
         if book.is_out:
-            ret = ttk.Button(actionFrame, text="Return")
+            ret = ttk.Button(actionFrame, text="Return",
+                             command=lambda: self._returnBook(book.isbn, book.title))
             ret.grid(column=0, row=0)
         else:
-            checkout = ttk.Button(actionFrame, text="Checkout")
+            checkout = ttk.Button(actionFrame, text="Checkout",
+                                  command=lambda: self._checkoutBook(book.isbn, book.title))
             checkout.grid(column=0, row=0)
-        
 
     def refresh(self):
         self.imgs = []
