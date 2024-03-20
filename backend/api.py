@@ -37,7 +37,13 @@ class BookService:
                         book.category, book.year, book.thumbnail)
         self.db.putLog(book.isbn, Action.CREATE, '')
 
-    
+    # TODO: Should these validate the current state of the book?
+    def checkoutBook(self, isbn, user):
+        self.db.putLog(isbn, Action.CHECKOUT, user)
+
+    def returnBook(self, isbn):
+        self.db.putLog(isbn, Action.RETURN, '')
+
 
 class LookupService:
 

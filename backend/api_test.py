@@ -119,6 +119,32 @@ class TestBookService(BaseTestCase):
 
         self.assertEqual(res, book)
 
+    def test_checkoutBook(self):
+        book = Book('isbn1', '', '', '', '', '')
+        self.books.createBook(book)
+        time.sleep(1)
+        self.books.checkoutBook('isbn1', 'user')
+
+        res = self.books.getBook('isbn1')
+
+        self.assertEqual(res.is_out, True)
+        self.assertEqual(res.checkout_user, 'user')
+        self.assertAboutNow(res.checkout_time)
+
+    def test_returnBook(self):
+        book = Book('isbn1', '', '', '', '', '')
+        self.books.createBook(book)
+        time.sleep(1)
+        self.books.checkoutBook('isbn1', 'user')
+        time.sleep(1)
+        self.books.returnBook('isbn1')
+
+        res = self.books.getBook('isbn1')
+
+        self.assertEqual(res.is_out, False)
+        self.assertEqual(res.checkout_user, '')
+        self.assertEqual(res.checkout_time, '')
+
 
 if __name__ == '__main__':
     unittest.main()
