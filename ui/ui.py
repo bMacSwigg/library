@@ -12,20 +12,10 @@ import urllib.request
 from backend.api import BookService, LookupService
 from backend.models import Book
 from constants import *
+from ui.book_details import BookDetails
 # Embarrassing for Tk that this needs a custom impl
 from ui.scrollable import ScrollFrame
 
-
-def imageFromUrl(url):
-    try:
-        with urllib.request.urlopen(url) as u:
-            data = u.read()
-        image = PIL.Image.open(io.BytesIO(data))
-    except ValueError as e:
-        # TODO: log the error and replace it with a default "error" img
-        print(e)
-        image = PIL.Image.new('RGB', (128,192), (0,0,0))
-    return PIL.ImageTk.PhotoImage(image)
 
 class _BaseTab:
 
@@ -46,69 +36,18 @@ class CatalogTab(_BaseTab):
     def __init__(self, tab, bs):
         super().__init__(tab, bs)
         # Track references to ImageTk instances so they don't disappear
-        self.imgs = []
+        self.rows = []
+        self._make()
 
     def _getBooks(self) -> list[Book]:
         return self.bs.listBooks()
 
-    def _checkoutBook(self, isbn, title):
-        prompt = ('Who is checking out \'%s\'?' % title)
-        user = askstring('Checkout', prompt)
-        if user is not None:
-            self.bs.checkoutBook(isbn, user)
-            # TODO: Only refresh this book row
-            self.refresh()
-
-    def _returnBook(self, isbn, title):
-        prompt = ('Confirm: Return \'%s\'?' % title)
-        confirm = askokcancel('Return', prompt)
-        if confirm:
-            self.bs.returnBook(isbn)
-            # TODO: Only refresh this book row
-            self.refresh()
-
     def _makeBookRow(self, book: Book, ind: int):
-        imgFrame = ttk.Frame(self.booksframe)
-        imgFrame.grid(column=0, row=ind, sticky=(N, W))
-        img = imageFromUrl(book.thumbnail)
-        self.imgs.append(img)
-        imglabel = ttk.Label(imgFrame, image=img)
-        imglabel.grid(column=0, row=0, sticky=(N, W))
-
-        metadataFrame = ttk.Frame(self.booksframe)
-        metadataFrame.grid(column=1, row=ind, sticky=(N, W))
-        title = ttk.Label(metadataFrame, text=book.title)
-        title.grid(column=0, row=0, sticky=(N, W))
-        title.configure(style=TITLE_STYLE)
-        author = ttk.Label(metadataFrame, text=book.author)
-        author.grid(column=0, row=1, sticky=W)
-        author.configure(style=AUTHOR_STYLE)
-        year = ttk.Label(metadataFrame, text=book.year)
-        year.grid(column=0, row=2, sticky=W)
-        year.configure(style=METADATA_STYLE)
-        isbn = ttk.Label(metadataFrame, text=('ISBN: %s' % book.isbn))
-        isbn.grid(column=0, row=3, sticky=W)
-        isbn.configure(style=METADATA_STYLE)
-        if book.is_out:
-            checkout_txt = ('Checked out by %s at %s' %
-                            (book.checkout_user, book.checkout_time))
-            checkout = ttk.Label(metadataFrame, text=checkout_txt)
-            checkout.grid(column=0, row=4, sticky=W, ipady=4)
-            checkout.configure(style=METADATA_STYLE)
-
-        actionFrame = ttk.Frame(self.booksframe)
-        actionFrame.grid(column=2, row=ind, sticky=E)
-        if book.is_out:
-            ret = ttk.Button(actionFrame, text="Return",
-                             command=lambda: self._returnBook(book.isbn, book.title))
-            ret.grid(column=0, row=0)
-        else:
-            checkout = ttk.Button(actionFrame, text="Checkout",
-                                  command=lambda: self._checkoutBook(book.isbn, book.title))
-            checkout.grid(column=0, row=0)
+        bd = BookDetails(self.booksframe, ind, self.bs, book)
+        self.rows.append(bd)
 
     def refresh(self):
-        self.imgs = []
+        self.rows = []
         super().refresh()
 
     def _make(self):
@@ -125,6 +64,7 @@ class ImportTab(_BaseTab):
     def __init__(self, tab, bs, ls):
         super().__init__(tab, bs)
         self.ls = ls
+        self._make()
 
     def _lookupBook(self):
         isbn = self.isbn.get()
@@ -247,8 +187,6 @@ class AppWindow:
         tabs.bind('<<NotebookTabChanged>>', self.refreshAllTabs)
 
         self.catalogTab = CatalogTab(tabCatalog, self.bs)
-        self.catalogTab.refresh()
         self.importTab = ImportTab(tabImport, self.bs, self.ls)
-        self.importTab.refresh()
 
         root.mainloop()
