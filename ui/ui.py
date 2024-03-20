@@ -19,7 +19,7 @@ from ui.scrollable import ScrollFrame
 
 class _BaseTab:
 
-    def __init__(self, tab, bs):
+    def __init__(self, tab: ttk.Frame, bs: BookService):
         self.tab = tab
         self.bs = bs
 
@@ -58,6 +58,46 @@ class CatalogTab(_BaseTab):
         books = self._getBooks()
         for i,book in enumerate(books):
             self._makeBookRow(book, i)
+
+class CirculationTab(_BaseTab):
+
+    def _lookupBook(self):
+        isbn = self.isbn.get()
+        if not isbn:
+            self._showError('Missing ISBN')
+            return
+        else:
+            self._clearError()
+        self.refresh()
+        book = self.bs.getBook(isbn)
+        self.bd = BookDetails(self.bookframe, 0, self.bs, book)
+
+    def _clearError(self):
+        if hasattr(self, 'error') and self.error.winfo_exists():
+            self.error.destroy()
+
+    def _showError(self, msg):
+        self._clearError()
+        self.error = ttk.Label(self.lookupframe, text=('Error: %s' % msg))
+        self.error.configure(style=ERROR_STYLE)
+        self.error.grid(column=3, row=0)
+
+    def _make(self):
+        self.lookupframe = ttk.Frame(self.tab)
+        self.lookupframe.grid(column=0, row=0, sticky=(N, W))
+        self.isbn = StringVar()
+        isbnLabel = ttk.Label(self.lookupframe, text="ISBN:")
+        isbnLabel.grid(column=0, row=0)
+        isbnEntry = ttk.Entry(self.lookupframe, width=20, textvariable=self.isbn)
+        isbnEntry.grid(column=1, row=0)
+        isbnEntry.bind('<Return>', lambda e: self._lookupBook())
+        isbnEntry.focus()
+        lookup = ttk.Button(self.lookupframe, text="Lookup",
+                            command=self._lookupBook)
+        lookup.grid(column=2, row=0)
+        
+        self.bookframe = ttk.Frame(self.tab)
+        self.bookframe.grid(column=0, row=1, sticky=(N, W))
 
 class ImportTab(_BaseTab):
 
@@ -159,6 +199,7 @@ class AppWindow:
     def refreshAllTabs(self, event):
         # TODO: Would be better to just figure out which tab was picked
         self.catalogTab.refresh()
+        self.circulationTab.refresh()
         self.importTab.refresh()
 
     def main(self):
@@ -178,15 +219,16 @@ class AppWindow:
 
         tabs = ttk.Notebook(mainframe)
         tabCatalog = ttk.Frame(tabs)
-        tabCheckout = ttk.Frame(tabs)
+        tabCirculation = ttk.Frame(tabs)
         tabImport = ttk.Frame(tabs)
         tabs.add(tabCatalog, text='Catalog')
-        tabs.add(tabCheckout, text='Checkout')
+        tabs.add(tabCirculation, text='Circulation')
         tabs.add(tabImport, text='Import')
         tabs.pack(expand=1, fill='both')
         tabs.bind('<<NotebookTabChanged>>', self.refreshAllTabs)
 
         self.catalogTab = CatalogTab(tabCatalog, self.bs)
+        self.circulationTab = CirculationTab(tabCirculation, self.bs)
         self.importTab = ImportTab(tabImport, self.bs, self.ls)
 
         root.mainloop()
