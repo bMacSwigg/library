@@ -2,7 +2,7 @@ import json
 from urllib.request import urlopen
 
 from backend.models import Book
-from backend.db import Database
+from backend.db import Action, Database
 
 class BookService:
 
@@ -12,21 +12,32 @@ class BookService:
     def __init__(self):
         self.db = Database(self.DB_FILE)
 
-    def _bookFromTuple(self, vals: tuple) -> Book:
-        return Book(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5])
+    def _bookFromTuple(self, book_vals: tuple, log_vals: tuple) -> Book:
+        is_out = (log_vals[2] == Action.CHECKOUT.value)
+        checkout_user = (log_vals[3] if is_out else '')
+        checkout_time = (log_vals[1] if is_out else '')
+        return Book(book_vals[0], book_vals[1], book_vals[2],
+                    book_vals[3], book_vals[4], book_vals[5],
+                    is_out, checkout_user, checkout_time)
 
     def getBook(self, isbn: str) -> Book:
-        vals = self.db.getBook(isbn)
-        return self._bookFromTuple(vals)
+        book_vals = self.db.getBook(isbn)
+        log_vals = self.db.getLatestLog(isbn)
+        return self._bookFromTuple(book_vals, log_vals)
 
     def listBooks(self) -> list[Book]:
         vals = self.db.listBooks()
-        return [self._bookFromTuple(val) for val in vals]
+        # It would probably be more efficient to do this with a JOIN in the DB
+        # query. But this is simpler, and the scale of data is too small to matter.
+        return [self._bookFromTuple(book_vals, self.db.getLatestLog(book_vals[0]))
+                for book_vals in vals]
 
     def createBook(self, book: Book):
         self.db.putBook(book.isbn, book.title, book.author,
                         book.category, book.year, book.thumbnail)
-        
+        self.db.putLog(book.isbn, Action.CREATE, '')
+
+    
 
 class LookupService:
 
