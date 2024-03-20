@@ -79,7 +79,7 @@ class CatalogTab(_BaseTab):
                             (book.checkout_user, book.checkout_time))
             checkout = ttk.Label(metadataFrame, text=checkout_txt)
             checkout.grid(column=0, row=4, sticky=W, ipady=4)
-            checkout.grid(style=METADATA_STYLE)
+            checkout.configure(style=METADATA_STYLE)
 
         actionFrame = ttk.Frame(self.booksframe)
         actionFrame.grid(column=2, row=ind, sticky=E)
