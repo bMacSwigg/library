@@ -9,7 +9,7 @@ from tkinter.messagebox import askokcancel
 from tkinter.simpledialog import askstring
 import urllib.request
 
-from backend.api import BookService, LookupService
+from backend.api import BookService, LookupService, NotFoundException
 from backend.models import Book
 from constants import *
 from ui.book_details import BookDetails
@@ -69,8 +69,11 @@ class CirculationTab(_BaseTab):
         else:
             self._clearError()
         self.refresh()
-        book = self.bs.getBook(isbn)
-        self.bd = BookDetails(self.bookframe, 0, self.bs, book)
+        try:
+            book = self.bs.getBook(isbn)
+            self.bd = BookDetails(self.bookframe, 0, self.bs, book)
+        except NotFoundException:
+            self._showError('No book with ISBN %s' % isbn)
 
     def _clearError(self):
         if hasattr(self, 'error') and self.error.winfo_exists():
