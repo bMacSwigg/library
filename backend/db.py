@@ -65,4 +65,4 @@ class Database:
         cur = self.con.cursor()
         query = ('SELECT * FROM %s WHERE Isbn="%s" ORDER BY Timestamp DESC LIMIT 1' %
                  (self.LOGS_TABLENAME, isbn))
-        return cur.execute(query).fetchone()
+        return cur.execute(query).fetchone() or (isbn, '', Action.UNKNOWN.value, '')

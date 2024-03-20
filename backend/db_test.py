@@ -3,8 +3,9 @@ from datetime import datetime, UTC
 import time
 
 from backend.db import Action, Database
+from backend.testbase import BaseTestCase
 
-class TestDatabase(unittest.TestCase):
+class TestDatabase(BaseTestCase):
 
     TEST_DATABASE = ':memory:'
 
@@ -54,10 +55,7 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(res[0], 'some-isbn')
         self.assertEqual(res[2], Action.CREATE.value)
         self.assertEqual(res[3], 'brian')
-        # Check it's on the right date, since exact timestamps will differ
-        now = datetime.now(UTC).date()
-        logtime = datetime.fromisoformat(res[1]).date()
-        self.assertEqual(logtime, now)
+        self.assertAboutNow(res[1])
 
     def test_logs_getsMostRecent(self):
         self.db.putLog('some-isbn', Action.CREATE, 'brian')
@@ -83,7 +81,7 @@ class TestDatabase(unittest.TestCase):
     def test_logs_noneMatching(self):
         res = self.db.getLatestLog('isbn1')
 
-        self.assertIsNone(res)
+        self.assertEqual(res, ('isbn1', '', 0, ''))
 
 
 if __name__ == '__main__':
