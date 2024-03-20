@@ -5,6 +5,13 @@ from backend.models import Book
 from backend.db import Action, Database
 from constants import *
 
+
+class NotFoundException(Exception):
+
+    def __init__(self, message = ''):
+        self.message = message
+        super().__init__(self.message)
+
 class BookService:
 
     def __init__(self):
@@ -20,6 +27,8 @@ class BookService:
 
     def getBook(self, isbn: str) -> Book:
         book_vals = self.db.getBook(isbn)
+        if book_vals is None:
+            raise NotFoundException('No book in database with ISBN %s' % isbn)
         log_vals = self.db.getLatestLog(isbn)
         return self._bookFromTuple(book_vals, log_vals)
 

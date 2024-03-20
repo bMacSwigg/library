@@ -1,7 +1,7 @@
 import unittest
 import time
 
-from backend.api import BookService
+from backend.api import BookService, NotFoundException
 from backend.db import Action, Database
 from backend.models import Book
 from backend.testbase import BaseTestCase
@@ -69,8 +69,7 @@ class TestBookService(BaseTestCase):
         self.assertEqual(book.checkout_time, '')
 
     def test_getBook_doesNotExist(self):
-        with self.assertRaises(TypeError):
-            # Not ideal error handling, but at least it's tested? lol
+        with self.assertRaises(NotFoundException):
             self.books.getBook('isbn1')
 
     def test_listBooks(self):
