@@ -69,5 +69,8 @@ class LookupService:
         else:
             category = ''
         year = vals['publishedDate'][:4] if 'publishedDate' in vals else ''
-        thumbnail = vals['imageLinks']['thumbnail']  # Too annoying to do safely
+        if 'imageLinks' in vals and 'thumbnail' in vals['imageLinks']:
+            thumbnail = vals['imageLinks']['thumbnail']
+        else:
+            thumbnail = ''
         return Book(isbn, title, author, category, year, thumbnail)
