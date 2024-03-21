@@ -37,7 +37,6 @@ class CatalogTab(_BaseTab):
         super().__init__(tab, bs)
         # Track references to ImageTk instances so they don't disappear
         self.rows = []
-        self._make()
 
     def _getBooks(self) -> list[Book]:
         return self.bs.listBooks()
@@ -107,7 +106,6 @@ class ImportTab(_BaseTab):
     def __init__(self, tab, bs, ls):
         super().__init__(tab, bs)
         self.ls = ls
-        self._make()
 
     def _lookupBook(self):
         isbn = self.isbn.get()
@@ -200,11 +198,14 @@ class AppWindow:
         self.bs = BookService()
         self.ls = LookupService()
 
-    def refreshAllTabs(self, event):
-        # TODO: Would be better to just figure out which tab was picked
-        self.catalogTab.refresh()
-        self.circulationTab.refresh()
-        self.importTab.refresh()
+    def refreshCurrentTab(self, event):
+        ind = self.tabs.index('current')
+        if ind == 0:
+            self.catalogTab.refresh()
+        elif ind == 1:
+            self.circulationTab.refresh()
+        elif ind == 2:
+            self.importTab.refresh()
 
     def main(self):
         root = Tk()
@@ -221,15 +222,15 @@ class AppWindow:
         root.columnconfigure(0, weight=1)
         root.rowconfigure(0, weight=1)
 
-        tabs = ttk.Notebook(mainframe)
-        tabCatalog = ttk.Frame(tabs)
-        tabCirculation = ttk.Frame(tabs)
-        tabImport = ttk.Frame(tabs)
-        tabs.add(tabCatalog, text='Catalog')
-        tabs.add(tabCirculation, text='Circulation')
-        tabs.add(tabImport, text='Import')
-        tabs.pack(expand=1, fill='both')
-        tabs.bind('<<NotebookTabChanged>>', self.refreshAllTabs)
+        self.tabs = ttk.Notebook(mainframe)
+        tabCatalog = ttk.Frame(self.tabs)
+        tabCirculation = ttk.Frame(self.tabs)
+        tabImport = ttk.Frame(self.tabs)
+        self.tabs.add(tabCatalog, text='Catalog')
+        self.tabs.add(tabCirculation, text='Circulation')
+        self.tabs.add(tabImport, text='Import')
+        self.tabs.pack(expand=1, fill='both')
+        self.tabs.bind('<<NotebookTabChanged>>', self.refreshCurrentTab)
 
         self.catalogTab = CatalogTab(tabCatalog, self.bs)
         self.circulationTab = CirculationTab(tabCirculation, self.bs)
