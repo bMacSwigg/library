@@ -130,7 +130,8 @@ class ImportTab(_BaseTab):
         c = self.category.get()
         y = self.year.get()
         url = self.thumbnail.get()
-        if all([i, t, a, c, y, url]):
+        # It's okay for the URL to be empty
+        if all([i, t, a, c, y]):
             book = Book(i, t, a, c, y, url)
             self.bs.createBook(book)
             self.refresh()

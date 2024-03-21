@@ -18,8 +18,10 @@ def imageFromUrl(url):
             data = u.read()
         image = PIL.Image.open(io.BytesIO(data))
     except ValueError as e:
-        # TODO: log the error and replace it with a default "error" img
-        print(e)
+        if url:
+            # If the URL was empty, this is expected, so no point logging
+            # TODO: log the error instead of just printing it
+            print(e)
         image = PIL.Image.new('RGB', (128,192), (0,0,0))
     return PIL.ImageTk.PhotoImage(image)
 
