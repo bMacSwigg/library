@@ -99,6 +99,7 @@ class CirculationTab(_BaseTab):
         try:
             book = self.bs.getBook(isbn)
             self.bd = BookDetails(self.bookframe, 0, self.bs, book, self.cil)
+            self.bd.refresh()
         except NotFoundException:
             self._showError('No book with ISBN %s' % isbn)
 
