@@ -13,6 +13,7 @@ from backend.api import BookService, LookupService, NotFoundException
 from backend.models import Book
 from constants import *
 from ui.book_details import BookDetails
+from ui.image_loader import CachedImageLoader
 # Embarrassing for Tk that this needs a custom impl
 from ui.scrollable import ScrollFrame
 
@@ -33,8 +34,9 @@ class _BaseTab:
 
 class CatalogTab(_BaseTab):
 
-    def __init__(self, tab, bs):
+    def __init__(self, tab, bs, cil):
         super().__init__(tab, bs)
+        self.cil = cil
         # Track references to ImageTk instances so they don't disappear
         self.rows = []
 
@@ -42,7 +44,7 @@ class CatalogTab(_BaseTab):
         return self.bs.listBooks()
 
     def _makeBookRow(self, book: Book, ind: int):
-        bd = BookDetails(self.booksframe, ind, self.bs, book)
+        bd = BookDetails(self.booksframe, ind, self.bs, book, self.cil)
         self.rows.append(bd)
 
     def refresh(self):
@@ -60,6 +62,10 @@ class CatalogTab(_BaseTab):
 
 class CirculationTab(_BaseTab):
 
+    def __init__(self, tab, bs, cil):
+        super().__init__(tab, bs)
+        self.cil = cil
+
     def _lookupBook(self):
         isbn = self.isbn.get()
         if not isbn:
@@ -70,7 +76,7 @@ class CirculationTab(_BaseTab):
         self.refresh()
         try:
             book = self.bs.getBook(isbn)
-            self.bd = BookDetails(self.bookframe, 0, self.bs, book)
+            self.bd = BookDetails(self.bookframe, 0, self.bs, book, self.cil)
         except NotFoundException:
             self._showError('No book with ISBN %s' % isbn)
 
@@ -197,6 +203,7 @@ class AppWindow:
     def __init__(self):
         self.bs = BookService()
         self.ls = LookupService()
+        self.cil = CachedImageLoader()
 
     def refreshCurrentTab(self, event):
         ind = self.tabs.index('current')
@@ -232,8 +239,8 @@ class AppWindow:
         self.tabs.pack(expand=1, fill='both')
         self.tabs.bind('<<NotebookTabChanged>>', self.refreshCurrentTab)
 
-        self.catalogTab = CatalogTab(tabCatalog, self.bs)
-        self.circulationTab = CirculationTab(tabCirculation, self.bs)
+        self.catalogTab = CatalogTab(tabCatalog, self.bs, self.cil)
+        self.circulationTab = CirculationTab(tabCirculation, self.bs, self.cil)
         self.importTab = ImportTab(tabImport, self.bs, self.ls)
 
         root.mainloop()

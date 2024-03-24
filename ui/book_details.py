@@ -10,30 +10,19 @@ import urllib.request
 from backend.api import BookService
 from backend.models import Book
 from constants import *
-
-
-def imageFromUrl(url):
-    try:
-        with urllib.request.urlopen(url) as u:
-            data = u.read()
-        image = PIL.Image.open(io.BytesIO(data))
-    except ValueError as e:
-        if url:
-            # If the URL was empty, this is expected, so no point logging
-            # TODO: log the error instead of just printing it
-            print(e)
-        image = PIL.Image.new('RGB', (128,192), (0,0,0))
-    return PIL.ImageTk.PhotoImage(image)
+from ui.image_loader import CachedImageLoader
 
 
 class BookDetails:
 
-    def __init__(self, frame: ttk.Frame, ind: int, bs: BookService, book: Book):
+    def __init__(self, frame: ttk.Frame, ind: int, bs: BookService, book: Book,
+                 cil: CachedImageLoader):
         self.frame = frame
         self.ind = ind
         self.bs = bs
         self.book = book
-        self.img = imageFromUrl(book.thumbnail)
+        self.cil = cil
+        self.img = PIL.ImageTk.PhotoImage(cil.getImage(book.thumbnail))
         self.frames = []
         self._make()
 
