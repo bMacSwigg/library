@@ -39,6 +39,7 @@ class CatalogTab(_BaseTab):
         self.cil = cil
         # Track references to ImageTk instances so they don't disappear
         self.rows = []
+        self.initialLoad = True
 
     def _getBooks(self) -> list[Book]:
         return self.bs.listBooks()
@@ -57,8 +58,29 @@ class CatalogTab(_BaseTab):
         self.booksframe = scrollframe.viewPort
 
         books = self._getBooks()
+
+        # Show a loading bar, but only on the first load (when there's lots of
+        # new data to load)
+        if self.initialLoad:
+            loadingframe = ttk.Frame(self.booksframe)
+            loadingframe.grid(column=0, row=0)
+            ttk.Label(loadingframe, text='Loading...').pack()
+            size = len(books) + 1  # +1 because Tkinter can't show a full bar
+            progressbar = ttk.Progressbar(loadingframe, maximum=size)
+            progressbar.pack()
+
+        # Load data
         for i,book in enumerate(books):
             self._makeBookRow(book, i)
+            if self.initialLoad:
+                progressbar.step(1)
+                self.tab.update()
+
+        if self.initialLoad:
+            loadingframe.destroy()
+            self.initialLoad = False
+        for book in self.rows:
+            book.refresh()
 
 class CirculationTab(_BaseTab):
 

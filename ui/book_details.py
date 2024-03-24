@@ -24,7 +24,6 @@ class BookDetails:
         self.cil = cil
         self.img = PIL.ImageTk.PhotoImage(cil.getImage(book.thumbnail))
         self.frames = []
-        self._make()
 
     def _checkout(self):
         prompt = ('Who is checking out \'%s\'?' % self.book.title)
