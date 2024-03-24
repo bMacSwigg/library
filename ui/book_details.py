@@ -53,7 +53,8 @@ class BookDetails:
 
         metadataFrame = ttk.Frame(self.frame)
         metadataFrame.grid(column=1, row=self.ind, sticky=(N, W))
-        title = ttk.Label(metadataFrame, text=self.book.title)
+        title = ttk.Label(metadataFrame, text=self.book.title,
+                          wraplength=300)
         title.grid(column=0, row=0, sticky=(N, W))
         title.configure(style=TITLE_STYLE)
         author = ttk.Label(metadataFrame, text=self.book.author)
