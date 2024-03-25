@@ -12,7 +12,7 @@ import urllib.request
 from backend.api import BookService, LookupService, NotFoundException
 from backend.models import Book
 from constants import *
-from ui.book_details import BookDetails
+from ui.book_list import BookList
 from ui.image_loader import CachedImageLoader
 # Embarrassing for Tk that this needs a custom impl
 from ui.scrollable import ScrollFrame
@@ -37,50 +37,26 @@ class CatalogTab(_BaseTab):
     def __init__(self, tab, bs, cil):
         super().__init__(tab, bs)
         self.cil = cil
-        # Track references to ImageTk instances so they don't disappear
-        self.rows = []
         self.initialLoad = True
+        self.books = None
 
     def _getBooks(self) -> list[Book]:
         return self.bs.listBooks()
 
-    def _makeBookRow(self, book: Book, ind: int):
-        bd = BookDetails(self.booksframe, ind, self.bs, book, self.cil)
-        self.rows.append(bd)
-
     def refresh(self):
-        self.rows = []
+        if self.books:
+            self.books.destroy()
         super().refresh()
 
     def _make(self):
         scrollframe = ScrollFrame(self.tab)
         scrollframe.pack(side='top', fill='both', expand=True)
-        self.booksframe = scrollframe.viewPort
 
-        books = self._getBooks()
+        self.books = BookList(scrollframe.viewPort, self._getBooks(),
+                              self.bs, self.cil)
+        self.books.display(self.initialLoad)
+        self.initialLoad = False
 
-        # Show a loading bar, but only on the first load (when there's lots of
-        # new data to load)
-        if self.initialLoad:
-            loadingframe = ttk.Frame(self.booksframe)
-            loadingframe.grid(column=0, row=0)
-            ttk.Label(loadingframe, text='Loading...').pack()
-            size = len(books) + 1  # +1 because Tkinter can't show a full bar
-            progressbar = ttk.Progressbar(loadingframe, maximum=size)
-            progressbar.pack()
-
-        # Load data
-        for i,book in enumerate(books):
-            self._makeBookRow(book, i)
-            if self.initialLoad:
-                progressbar.step(1)
-                self.tab.update()
-
-        if self.initialLoad:
-            loadingframe.destroy()
-            self.initialLoad = False
-        for book in self.rows:
-            book.refresh()
 
 class CirculationTab(_BaseTab):
 
@@ -98,8 +74,7 @@ class CirculationTab(_BaseTab):
         self.refresh()
         try:
             book = self.bs.getBook(isbn)
-            self.bd = BookDetails(self.bookframe, 0, self.bs, book, self.cil)
-            self.bd.refresh()
+            BookList(self.bookframe, [book], self.bs, self.cil).display(False)
         except NotFoundException:
             self._showError('No book with ISBN %s' % isbn)
 
