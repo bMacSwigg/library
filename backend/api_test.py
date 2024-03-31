@@ -110,6 +110,16 @@ class TestBookService(BaseTestCase):
         self.assertEqual(books[1].checkout_user, '')
         self.assertEqual(books[1].checkout_time, '')
 
+    def test_listBooks_withSearch(self):
+        self.books.db.putBook('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
+        self.books.db.putBook('isbn2', 'Looking For Alaska', 'John Green', 'Fiction', '2005', 'url')
+
+        books = self.books.listBooks('looking')
+
+        self.assertEqual(len(books), 1)
+        self.assertEqual(books[0].isbn, 'isbn2')
+        self.assertEqual(books[0].title, 'Looking For Alaska')
+
     def test_createBook(self):
         book = Book('isbn1', 'Paul', 'Andrea Lawler', 'Fiction', '2017', 'url')
 

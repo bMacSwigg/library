@@ -47,6 +47,18 @@ class TestDatabase(BaseTestCase):
                          [('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url'),
                           ('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')])
 
+    def test_list_withSearch(self):
+        self.db.putBook('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
+        self.db.putBook('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')
+
+        self.assertEqual(self.db.listBooks('for'),
+                         [('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')])
+        self.assertEqual(self.db.listBooks('Kuang'),
+                         [('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')])
+        self.assertEqual(self.db.listBooks('a'),
+                         [('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url'),
+                          ('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')])
+
     def test_logs_putAndGet(self):
         self.db.putLog('some-isbn', Action.CREATE, 'brian')
 

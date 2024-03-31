@@ -32,8 +32,8 @@ class BookService:
         log_vals = self.db.getLatestLog(isbn)
         return self._bookFromTuple(book_vals, log_vals)
 
-    def listBooks(self) -> list[Book]:
-        vals = self.db.listBooks()
+    def listBooks(self, search: str|None = None) -> list[Book]:
+        vals = self.db.listBooks(search)
         # It would probably be more efficient to do this with a JOIN in the DB
         # query. But this is simpler, and the scale of data is too small to matter.
         return [self._bookFromTuple(book_vals, self.db.getLatestLog(book_vals[0]))

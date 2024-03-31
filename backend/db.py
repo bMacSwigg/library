@@ -49,9 +49,12 @@ class Database:
         cur.execute(query)
         self.con.commit()
 
-    def listBooks(self):
+    def listBooks(self, search: str|None = None):
         cur = self.con.cursor()
         query = 'SELECT * FROM %s' % self.BOOKS_TABLENAME
+        if search:
+            comparison = 'LIKE "%%%s%%"' % search
+            query += ' WHERE Title %s OR Author %s' % (comparison, comparison)
         return cur.execute(query).fetchall()
 
     def putLog(self, isbn: str, action: Action, user: str):
