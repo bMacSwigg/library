@@ -39,9 +39,10 @@ class CatalogTab(_BaseTab):
         self.cil = cil
         self.initialLoad = True
         self.books = None
+        self.query = StringVar()
 
     def _getBooks(self) -> list[Book]:
-        return self.bs.listBooks()
+        return self.bs.listBooks(self.query.get())
 
     def refresh(self):
         if self.books:
@@ -51,9 +52,9 @@ class CatalogTab(_BaseTab):
     def _make(self):
         searchframe = ttk.Frame(self.tab)
         searchframe.pack(side='top', fill='x', expand=False)
-        searchentry = ttk.Entry(searchframe, width=20)
+        searchentry = ttk.Entry(searchframe, width=20, textvariable=self.query)
         searchentry.pack(side='left')
-        searchbtn = ttk.Button(searchframe, text='Search')
+        searchbtn = ttk.Button(searchframe, text='Search', command=self.refresh)
         searchbtn.pack(side='left')
         
         scrollframe = ScrollFrame(self.tab)
