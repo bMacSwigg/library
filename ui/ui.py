@@ -49,9 +49,15 @@ class CatalogTab(_BaseTab):
         super().refresh()
 
     def _make(self):
+        searchframe = ttk.Frame(self.tab)
+        searchframe.pack(side='top', fill='x', expand=False)
+        searchentry = ttk.Entry(searchframe, width=20)
+        searchentry.pack(side='left')
+        searchbtn = ttk.Button(searchframe, text='Search')
+        searchbtn.pack(side='left')
+        
         scrollframe = ScrollFrame(self.tab)
-        scrollframe.pack(side='top', fill='both', expand=True)
-
+        scrollframe.pack(side='bottom', fill='both', expand=True)
         self.books = BookList(scrollframe.viewPort, self._getBooks(),
                               self.bs, self.cil)
         self.books.display(self.initialLoad)
