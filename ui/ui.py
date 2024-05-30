@@ -13,6 +13,7 @@ from backend.api import BookService, LookupService, NotFoundException
 from backend.models import Book
 from constants import *
 from ui.book_list import BookList
+from ui.hinted_entry import HintedEntry, HintedStringVar
 from ui.image_loader import CachedImageLoader
 # Embarrassing for Tk that this needs a custom impl
 from ui.scrollable import ScrollFrame
@@ -39,7 +40,7 @@ class CatalogTab(_BaseTab):
         self.cil = cil
         self.initialLoad = True
         self.books = None
-        self.query = StringVar()
+        self.query = HintedStringVar('Title or author...')
 
     def _getBooks(self) -> list[Book]:
         return self.bs.listBooks(self.query.get())
@@ -52,7 +53,7 @@ class CatalogTab(_BaseTab):
     def _make(self):
         searchframe = ttk.Frame(self.tab)
         searchframe.pack(side='top', fill='x', expand=False)
-        searchentry = ttk.Entry(searchframe, width=20, textvariable=self.query)
+        searchentry = HintedEntry(searchframe, width=20, textvariable=self.query)
         searchentry.pack(side='left')
         searchbtn = ttk.Button(searchframe, text='Search', command=self.refresh)
         searchbtn.pack(side='left')
