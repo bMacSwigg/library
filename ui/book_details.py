@@ -69,7 +69,7 @@ class BookDetails:
         if self.book.is_out:
             checkout_txt = ('Checked out by %s at %s' %
                             (self.book.checkout_user, self.book.checkout_time))
-            checkout = ttk.Label(metadataFrame, text=checkout_txt)
+            checkout = ttk.Label(metadataFrame, text=checkout_txt, wraplength=300)
             checkout.grid(column=0, row=4, sticky=W, ipady=4)
             checkout.configure(style=METADATA_STYLE)
 
