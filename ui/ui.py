@@ -54,6 +54,7 @@ class CatalogTab(_BaseTab):
         searchframe = ttk.Frame(self.tab)
         searchframe.pack(side='top', fill='x', expand=False)
         searchentry = HintedEntry(searchframe, width=20, textvariable=self.query)
+        searchentry.bind('<Return>', lambda e: self.refresh())
         searchentry.pack(side='left')
         searchbtn = ttk.Button(searchframe, text='Search', command=self.refresh)
         searchbtn.pack(side='left')
