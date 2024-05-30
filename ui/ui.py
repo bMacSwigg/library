@@ -86,6 +86,11 @@ class CirculationTab(_BaseTab):
         except NotFoundException:
             self._showError('No book with ISBN %s' % isbn)
 
+    def _checkedOutBooks(self):
+        self.refresh()
+        books = self.bs.listBooksByStatus(True)
+        BookList(self.bookframe, books, self.bs, self.cil).display(False)
+
     def _clearError(self):
         if hasattr(self, 'error') and self.error.winfo_exists():
             self.error.destroy()
@@ -100,15 +105,18 @@ class CirculationTab(_BaseTab):
         self.lookupframe = ttk.Frame(self.tab)
         self.lookupframe.grid(column=0, row=0, sticky=(N, W))
         self.isbn = StringVar()
-        isbnLabel = ttk.Label(self.lookupframe, text="ISBN:")
+        isbnLabel = ttk.Label(self.lookupframe, text='ISBN:')
         isbnLabel.grid(column=0, row=0)
         isbnEntry = ttk.Entry(self.lookupframe, width=20, textvariable=self.isbn)
         isbnEntry.grid(column=1, row=0)
         isbnEntry.bind('<Return>', lambda e: self._lookupBook())
         isbnEntry.focus()
-        lookup = ttk.Button(self.lookupframe, text="Lookup",
+        lookup = ttk.Button(self.lookupframe, text='Lookup',
                             command=self._lookupBook)
         lookup.grid(column=2, row=0)
+        checkedOut = ttk.Button(self.lookupframe, text='Checked Out',
+                                command=self._checkedOutBooks)
+        checkedOut.grid(column=3, row=0)
         
         self.bookframe = ttk.Frame(self.tab)
         self.bookframe.grid(column=0, row=1, sticky=(N, W))
