@@ -103,7 +103,8 @@ class CirculationTab(_BaseTab):
 
     def _make(self):
         self.lookupframe = ttk.Frame(self.tab)
-        self.lookupframe.grid(column=0, row=0, sticky=(N, W))
+        self.lookupframe.pack(side='top', fill='x', expand=False)
+
         self.isbn = StringVar()
         isbnLabel = ttk.Label(self.lookupframe, text='ISBN:')
         isbnLabel.grid(column=0, row=0)
@@ -117,9 +118,10 @@ class CirculationTab(_BaseTab):
         checkedOut = ttk.Button(self.lookupframe, text='Checked Out',
                                 command=self._checkedOutBooks)
         checkedOut.grid(column=3, row=0)
-        
-        self.bookframe = ttk.Frame(self.tab)
-        self.bookframe.grid(column=0, row=1, sticky=(N, W))
+
+        scrollframe = ScrollFrame(self.tab)
+        scrollframe.pack(side='bottom', fill='both', expand=True)
+        self.bookframe = scrollframe.viewPort
 
 class ImportTab(_BaseTab):
 
