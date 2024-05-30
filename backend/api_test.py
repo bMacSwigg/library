@@ -120,6 +120,28 @@ class TestBookService(BaseTestCase):
         self.assertEqual(books[0].isbn, 'isbn2')
         self.assertEqual(books[0].title, 'Looking For Alaska')
 
+    def test_listBooksByStatus_checkedOut(self):
+        self.books.db.putBook('isbn-in', '', '', '', '', '')
+        self.books.db.putBook('isbn-out', '', '', '', '', '')
+        self.books.db.putLog('isbn-in', Action.CREATE, '')
+        self.books.db.putLog('isbn-out', Action.CHECKOUT, 'somebody')
+
+        books = self.books.listBooksByStatus(True)
+
+        self.assertEqual(len(books), 1)
+        self.assertEqual(books[0].isbn, 'isbn-out')
+
+    def test_listBooksByStatus_checkedIn(self):
+        self.books.db.putBook('isbn-in', '', '', '', '', '')
+        self.books.db.putBook('isbn-out', '', '', '', '', '')
+        self.books.db.putLog('isbn-in', Action.CREATE, '')
+        self.books.db.putLog('isbn-out', Action.CHECKOUT, 'somebody')
+
+        books = self.books.listBooksByStatus(False)
+
+        self.assertEqual(len(books), 1)
+        self.assertEqual(books[0].isbn, 'isbn-in')
+        
     def test_createBook(self):
         book = Book('isbn1', 'Paul', 'Andrea Lawler', 'Fiction', '2017', 'url')
 

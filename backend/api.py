@@ -39,6 +39,11 @@ class BookService:
         return [self._bookFromTuple(book_vals, self.db.getLatestLog(book_vals[0]))
                 for book_vals in vals]
 
+    # Lists all checked-out or checked-in books
+    def listBooksByStatus(self, is_out) -> list[Book]:
+        allBooks = self.listBooks()
+        return [b for b in allBooks if b.is_out == is_out]
+
     def createBook(self, book: Book):
         self.db.putBook(book.isbn, book.title, book.author,
                         book.category, book.year, book.thumbnail)
