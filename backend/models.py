@@ -11,3 +11,9 @@ class Book:
     is_out: bool = False  # True if the book is currently checked out
     checkout_user: str = ''  # The user who checked it out (only set if is_out)
     checkout_time: str = ''  # Timestamp of checkout (only set if is_out)
+
+@dataclass(frozen=True)
+class User:
+    user_id: int  # Unique pseudorandom ID of this user
+    name: str  # Full name
+    email: str  # Email address for notifications
