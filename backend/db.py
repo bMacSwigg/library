@@ -12,6 +12,7 @@ class Database:
 
     BOOKS_TABLENAME = 'Books'
     LOGS_TABLENAME = 'ActionLogs'
+    USERS_TABLENAME = 'Users'
 
     def __init__(self, filename):
         self.filename = filename
@@ -31,6 +32,7 @@ class Database:
         tables = cur.execute('SELECT name FROM sqlite_schema').fetchall()
         self._findTable(self.BOOKS_TABLENAME, tables)
         self._findTable(self.LOGS_TABLENAME, tables)
+        self._findTable(self.USERS_TABLENAME, tables)
 
     def _findTable(self, tablename, tables):
         if (tablename,) not in tables:
@@ -69,3 +71,20 @@ class Database:
         query = ('SELECT * FROM %s WHERE Isbn="%s" ORDER BY Timestamp DESC LIMIT 1' %
                  (self.LOGS_TABLENAME, isbn))
         return cur.execute(query).fetchone() or (isbn, '', Action.UNKNOWN.value, '')
+
+    def putUser(self, user_id, name, email):
+        cur = self.con.cursor()
+        query = ('INSERT INTO %s VALUES (%d, "%s", "%s")' %
+                 (self.USERS_TABLENAME, user_id, name, email))
+        cur.execute(query)
+        self.con.commit()
+        
+    def getUser(self, user_id):
+        cur = self.con.cursor()
+        query = ('SELECT * FROM %s WHERE Id=%d' % (self.USERS_TABLENAME, user_id))
+        return cur.execute(query).fetchone()
+
+    def listUsers(self):
+        cur = self.con.cursor()
+        query = 'SELECT * FROM %s' % self.USERS_TABLENAME
+        return cur.execute(query).fetchall()

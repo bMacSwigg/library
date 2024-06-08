@@ -25,19 +25,21 @@ class TestDatabase(BaseTestCase):
     def test_check_tablesMissing(self):
         self.db.con.cursor().execute('DROP TABLE Books')
         self.db.con.cursor().execute('DROP TABLE ActionLogs')
+        self.db.con.cursor().execute('DROP TABLE Users')
         with self.assertLogs('db_logger', level='WARNING') as lc:
             self.db.check()
             self.assertEqual(lc.output,
                              ['WARNING:db_logger:Table Books does not exist',
-                              'WARNING:db_logger:Table ActionLogs does not exist'])
+                              'WARNING:db_logger:Table ActionLogs does not exist',
+                              'WARNING:db_logger:Table Users does not exist'])
 
-    def test_putAndGet(self):
+    def test_book_putAndGet(self):
         self.db.putBook('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url')
         res = self.db.getBook('some-isbn')
 
         self.assertEqual(res, ('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url'))
 
-    def test_list(self):
+    def test_book_list(self):
         self.db.putBook('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
         self.db.putBook('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')
 
@@ -47,7 +49,7 @@ class TestDatabase(BaseTestCase):
                          [('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url'),
                           ('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')])
 
-    def test_list_withSearch(self):
+    def test_book_listWithSearch(self):
         self.db.putBook('isbn1', 'Babel', 'R.F. Kuang', 'Fiction', '2022', 'url')
         self.db.putBook('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')
 
@@ -94,6 +96,23 @@ class TestDatabase(BaseTestCase):
         res = self.db.getLatestLog('isbn1')
 
         self.assertEqual(res, ('isbn1', '', 0, ''))
+
+    def test_user_putAndGet(self):
+        self.db.putUser(1234, 'John Doe', 'john@example.com')
+        res = self.db.getUser(1234)
+
+        self.assertEqual(res, (1234, 'John Doe', 'john@example.com'))
+
+    def test_user_list(self):
+        self.db.putUser(1234, 'John Doe', 'john@example.com')
+        self.db.putUser(5678, 'Jane Doe', 'jane@example.com')
+
+        res = self.db.listUsers()
+
+        self.assertEqual(res,
+                         [(1234, 'John Doe', 'john@example.com'),
+                          (5678, 'Jane Doe', 'jane@example.com')])
+
 
 
 if __name__ == '__main__':
