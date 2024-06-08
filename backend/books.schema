@@ -16,3 +16,9 @@ CREATE TABLE ActionLogs(
 
 CREATE UNIQUE INDEX LogsByTimestamp
 ON ActionLogs(Isbn, Timestamp DESC);
+
+CREATE TABLE Users(
+  Id     INTEGER PRIMARY KEY,
+  Name   TEXT,
+  Email  TEXT
+);
