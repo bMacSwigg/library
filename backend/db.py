@@ -61,7 +61,7 @@ class Database:
 
     def putLog(self, isbn: str, action: Action, user: str):
         cur = self.con.cursor()
-        query = ('INSERT INTO %s VALUES ("%s", datetime("now"), %s, "%s")' %
+        query = ('INSERT INTO %s VALUES ("%s", datetime("now"), %s, "%s", 0)' %
                  (self.LOGS_TABLENAME, isbn, action.value, user))
         cur.execute(query)
         self.con.commit()

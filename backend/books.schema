@@ -11,7 +11,8 @@ CREATE TABLE ActionLogs(
   Isbn      TEXT,
   Timestamp TEXT,
   Action    INTEGER,
-  User      TEXT
+  User      TEXT,    /* Deprecated (replaced by UserId) */
+  UserId    INTEGER  /* Users.Id below */
 );
 
 CREATE UNIQUE INDEX LogsByTimestamp
