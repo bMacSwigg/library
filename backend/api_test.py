@@ -184,6 +184,20 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res.checkout_user, '')
         self.assertEqual(res.checkout_time, '')
 
+    def test_listUsers(self):
+        self.books.db.putUser(1234, 'Brian', 'me@example.com')
+        self.books.db.putUser(5678, 'Other', 'someone@example.com')
+
+        res = self.books.listUsers()
+
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0].user_id, 1234)
+        self.assertEqual(res[0].name, 'Brian')
+        self.assertEqual(res[0].email, 'me@example.com')
+        self.assertEqual(res[1].user_id, 5678)
+        self.assertEqual(res[1].name, 'Other')
+        self.assertEqual(res[1].email, 'someone@example.com')
+
 
 if __name__ == '__main__':
     unittest.main()

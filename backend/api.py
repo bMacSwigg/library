@@ -65,6 +65,10 @@ class BookService:
     def returnBook(self, isbn):
         self.db.putLog(isbn, Action.RETURN)
 
+    def listUsers(self):
+        vals = self.db.listUsers()
+        return [User(v[0], v[1], v[2]) for v in vals]
+
 
 class LookupService:
 
