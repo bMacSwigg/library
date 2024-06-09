@@ -16,10 +16,10 @@ class ComboBoxDialog(Dialog):
         Dialog.destroy(self)
 
     def body(self, master):
-
         label = ttk.Label(master, text=self.prompt, justify=LEFT)
         label.grid(row=0, padx=5, sticky=W)
-        
+
+        # TODO: Filter list of choices based on text (like autocomplete)
         self.combobox = ttk.Combobox(master, value=self.choices)
         self.combobox.grid(row=1, padx=5, sticky=W+E)
 
