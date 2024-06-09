@@ -62,40 +62,40 @@ class TestDatabase(BaseTestCase):
                           ('isbn2', 'Looking for Alaska', 'John Green', 'Fiction', '2005', 'url')])
 
     def test_logs_putAndGet(self):
-        self.db.putLog('some-isbn', Action.CREATE, 'brian')
+        self.db.putLog('some-isbn', Action.CREATE, 1234)
 
         res = self.db.getLatestLog('some-isbn')
 
         self.assertEqual(res[0], 'some-isbn')
         self.assertEqual(res[2], Action.CREATE.value)
-        self.assertEqual(res[3], 'brian')
+        self.assertEqual(res[4], 1234)
         self.assertAboutNow(res[1])
 
     def test_logs_getsMostRecent(self):
-        self.db.putLog('some-isbn', Action.CREATE, 'brian')
+        self.db.putLog('some-isbn', Action.CREATE, 1234)
         time.sleep(1)  # Hack to keep the timestamps from colliding
-        self.db.putLog('some-isbn', Action.CHECKOUT, 'friend')
+        self.db.putLog('some-isbn', Action.CHECKOUT, 5678)
 
         res = self.db.getLatestLog('some-isbn')
 
         self.assertEqual(res[0], 'some-isbn')
         self.assertEqual(res[2], Action.CHECKOUT.value)
-        self.assertEqual(res[3], 'friend')
+        self.assertEqual(res[4], 5678)
 
     def test_logs_getsMatchingIsbn(self):
-        self.db.putLog('isbn1', Action.CREATE, 'brian')
-        self.db.putLog('isbn2', Action.CHECKOUT, 'friend')
+        self.db.putLog('isbn1', Action.CREATE, 1234)
+        self.db.putLog('isbn2', Action.CHECKOUT, 5678)
 
         res = self.db.getLatestLog('isbn1')
 
         self.assertEqual(res[0], 'isbn1')
         self.assertEqual(res[2], Action.CREATE.value)
-        self.assertEqual(res[3], 'brian')
+        self.assertEqual(res[4], 1234)
 
     def test_logs_noneMatching(self):
         res = self.db.getLatestLog('isbn1')
 
-        self.assertEqual(res, ('isbn1', '', 0, ''))
+        self.assertEqual(res, ('isbn1', '', 0, '', 0))
 
     def test_user_putAndGet(self):
         self.db.putUser(1234, 'John Doe', 'john@example.com')

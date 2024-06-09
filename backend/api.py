@@ -1,7 +1,7 @@
 import json
 from urllib.request import urlopen
 
-from backend.models import Book
+from backend.models import Book, User
 from backend.db import Action, Database
 from constants import *
 
@@ -19,8 +19,17 @@ class BookService:
 
     def _bookFromTuple(self, book_vals: tuple, log_vals: tuple) -> Book:
         is_out = (log_vals[2] == Action.CHECKOUT.value)
-        checkout_user = (log_vals[3] if is_out else '')
-        checkout_time = (log_vals[1] if is_out else '')
+        if is_out:
+            user_id = log_vals[4]
+            checkout_user = (
+                self.db.getUser(user_id)[1]
+                if user_id
+                else log_vals[3]
+            )
+            checkout_time = log_vals[1]
+        else:
+            (checkout_user, checkout_time) = ('', '')
+
         return Book(book_vals[0], book_vals[1], book_vals[2],
                     book_vals[3], book_vals[4], book_vals[5],
                     is_out, checkout_user, checkout_time)
@@ -47,14 +56,14 @@ class BookService:
     def createBook(self, book: Book):
         self.db.putBook(book.isbn, book.title, book.author,
                         book.category, book.year, book.thumbnail)
-        self.db.putLog(book.isbn, Action.CREATE, '')
+        self.db.putLog(book.isbn, Action.CREATE)
 
     # TODO: Should these validate the current state of the book?
-    def checkoutBook(self, isbn, user):
-        self.db.putLog(isbn, Action.CHECKOUT, user)
+    def checkoutBook(self, isbn: str, user: User):
+        self.db.putLog(isbn, Action.CHECKOUT, user.user_id)
 
     def returnBook(self, isbn):
-        self.db.putLog(isbn, Action.RETURN, '')
+        self.db.putLog(isbn, Action.RETURN)
 
 
 class LookupService:

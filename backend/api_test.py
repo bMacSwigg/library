@@ -3,7 +3,7 @@ import time
 
 from backend.api import BookService, NotFoundException
 from backend.db import Action, Database
-from backend.models import Book
+from backend.models import Book, User
 from backend.testbase import BaseTestCase
 
 class TestBookService(BaseTestCase):
@@ -40,7 +40,8 @@ class TestBookService(BaseTestCase):
 
     def test_getBook_setsCheckoutLogVals(self):
         self.books.db.putBook('isbn1', 'title', 'author', 'cat', 'year', 'img')
-        self.books.db.putLog('isbn1', Action.CHECKOUT, 'somebody')
+        self.books.db.putUser(1234, 'somebody', 'test@example.com')
+        self.books.db.putLog('isbn1', Action.CHECKOUT, 1234)
 
         book = self.books.getBook('isbn1')
 
@@ -50,7 +51,7 @@ class TestBookService(BaseTestCase):
 
     def test_getBook_setsReturnLogVals(self):
         self.books.db.putBook('isbn1', 'title', 'author', 'cat', 'year', 'img')
-        self.books.db.putLog('isbn1', Action.RETURN, 'somebody')
+        self.books.db.putLog('isbn1', Action.RETURN)
 
         book = self.books.getBook('isbn1')
 
@@ -60,7 +61,7 @@ class TestBookService(BaseTestCase):
 
     def test_getBook_setsCreateLogVals(self):
         self.books.db.putBook('isbn1', 'title', 'author', 'cat', 'year', 'img')
-        self.books.db.putLog('isbn1', Action.CREATE, 'somebody')
+        self.books.db.putLog('isbn1', Action.CREATE)
 
         book = self.books.getBook('isbn1')
 
@@ -92,12 +93,13 @@ class TestBookService(BaseTestCase):
         self.assertEqual(books[1].thumbnail, 'url')
 
     def test_listBooks_setsLogValues(self):
+        self.books.db.putUser(1234, 'somebody', 'test@example.com')
         self.books.db.putBook('isbn1', '', '', '', '', '')
         self.books.db.putBook('isbn2', '', '', '', '', '')
-        self.books.db.putLog('isbn1', Action.CREATE, '')
-        self.books.db.putLog('isbn2', Action.CREATE, '')
+        self.books.db.putLog('isbn1', Action.CREATE)
+        self.books.db.putLog('isbn2', Action.CREATE)
         time.sleep(1)
-        self.books.db.putLog('isbn1', Action.CHECKOUT, 'somebody')
+        self.books.db.putLog('isbn1', Action.CHECKOUT, 1234)
 
         books = self.books.listBooks()
 
@@ -121,10 +123,11 @@ class TestBookService(BaseTestCase):
         self.assertEqual(books[0].title, 'Looking For Alaska')
 
     def test_listBooksByStatus_checkedOut(self):
+        self.books.db.putUser(1234, 'somebody', 'test@example.com')
         self.books.db.putBook('isbn-in', '', '', '', '', '')
         self.books.db.putBook('isbn-out', '', '', '', '', '')
-        self.books.db.putLog('isbn-in', Action.CREATE, '')
-        self.books.db.putLog('isbn-out', Action.CHECKOUT, 'somebody')
+        self.books.db.putLog('isbn-in', Action.CREATE)
+        self.books.db.putLog('isbn-out', Action.CHECKOUT, 1234)
 
         books = self.books.listBooksByStatus(True)
 
@@ -132,10 +135,11 @@ class TestBookService(BaseTestCase):
         self.assertEqual(books[0].isbn, 'isbn-out')
 
     def test_listBooksByStatus_checkedIn(self):
+        self.books.db.putUser(1234, 'somebody', 'test@example.com')
         self.books.db.putBook('isbn-in', '', '', '', '', '')
         self.books.db.putBook('isbn-out', '', '', '', '', '')
-        self.books.db.putLog('isbn-in', Action.CREATE, '')
-        self.books.db.putLog('isbn-out', Action.CHECKOUT, 'somebody')
+        self.books.db.putLog('isbn-in', Action.CREATE)
+        self.books.db.putLog('isbn-out', Action.CHECKOUT, 1234)
 
         books = self.books.listBooksByStatus(False)
 
@@ -153,8 +157,10 @@ class TestBookService(BaseTestCase):
     def test_checkoutBook(self):
         book = Book('isbn1', '', '', '', '', '')
         self.books.createBook(book)
+        user = User(1234, 'user', 'user@example.com')
+        self.books.db.putUser(user.user_id, user.name, user.email)
         time.sleep(1)
-        self.books.checkoutBook('isbn1', 'user')
+        self.books.checkoutBook('isbn1', user)
 
         res = self.books.getBook('isbn1')
 
@@ -165,8 +171,10 @@ class TestBookService(BaseTestCase):
     def test_returnBook(self):
         book = Book('isbn1', '', '', '', '', '')
         self.books.createBook(book)
+        user = User(1234, 'user', 'user@example.com')
+        self.books.db.putUser(user.user_id, user.name, user.email)
         time.sleep(1)
-        self.books.checkoutBook('isbn1', 'user')
+        self.books.checkoutBook('isbn1', user)
         time.sleep(1)
         self.books.returnBook('isbn1')
 
