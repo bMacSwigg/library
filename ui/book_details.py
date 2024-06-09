@@ -10,6 +10,7 @@ import urllib.request
 from backend.api import BookService
 from backend.models import Book
 from constants import *
+from ui.combobox_dialog import askcombo
 from ui.image_loader import CachedImageLoader
 
 
@@ -26,10 +27,13 @@ class BookDetails:
         self.frames = []
 
     def _checkout(self):
+        users = {('%s (%d)' % (u.name, u.user_id)):u
+                 for u in self.bs.listUsers()}
+        
         prompt = ('Who is checking out \'%s\'?' % self.book.title)
-        user = askstring('Checkout', prompt)
+        user = askcombo('Checkout', prompt, list(users))
         if user is not None:
-            self.bs.checkoutBook(self.book.isbn, user)
+            self.bs.checkoutBook(self.book.isbn, users[user])
             self.refresh()
 
     def _return(self):
@@ -84,3 +88,17 @@ class BookDetails:
             checkout.grid(column=0, row=0)
 
         self.frames = [imgFrame, metadataFrame, actionFrame]
+
+# TODO: Get this working
+if __name__ == '__main__':
+    bs = BookService()
+    cil = CachedImageLoader()
+    book = Book('9780063021426', 'Babel', 'R. F. Kuang', 'Fiction', '2022',
+                'http://books.google.com/books/content?id=rkO-zgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
+                True, 'Brian', 'Sometime')
+
+    root = Tk()
+    frame = ttk.Frame(root)
+    bd = BookDetails(frame, 0, bs, book, cil)
+    bd.refresh()
+    root.mainloop()
