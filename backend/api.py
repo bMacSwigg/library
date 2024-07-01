@@ -75,6 +75,9 @@ class BookService:
         logs = map(lambda l: (l[2],) + self._parseLogs(l), logs)
         return list(logs)
 
+    def createUser(self, user: User):
+        self.db.putUser(user.user_id, user.name, user.email)
+
     def listUsers(self):
         vals = self.db.listUsers()
         return [User(v[0], v[1], v[2]) for v in vals]
