@@ -10,6 +10,7 @@ import urllib.request
 from backend.api import BookService
 from backend.models import Book
 from constants import *
+from ui.checkout_history import CheckoutHistory
 from ui.combobox_dialog import askcombo
 from ui.image_loader import CachedImageLoader
 
@@ -42,6 +43,9 @@ class BookDetails:
         if confirm:
             self.bs.returnBook(self.book.isbn)
             self.refresh()
+
+    def _history(self):
+        CheckoutHistory(self.bs, self.book)
 
     def refresh(self):
         for frame in self.frames:
@@ -86,6 +90,8 @@ class BookDetails:
             checkout = ttk.Button(actionFrame, text="Checkout",
                                   command=self._checkout)
             checkout.grid(column=0, row=0)
+        history = ttk.Button(actionFrame, text="History", command=self._history)
+        history.grid(column=0, row=1)
 
         self.frames = [imgFrame, metadataFrame, actionFrame]
 
