@@ -17,16 +17,20 @@ class BookService:
     def __init__(self):
         self.db = Database(DB_FILE)
 
+    def _parseLogs(self, log_vals: tuple) -> tuple[str, str]:
+        user_id = log_vals[4]
+        user = (
+            self.db.getUser(user_id)[1]
+            if user_id
+            else log_vals[3]
+        )
+        time = log_vals[1]
+        return user, time
+
     def _bookFromTuple(self, book_vals: tuple, log_vals: tuple) -> Book:
         is_out = (log_vals[2] == Action.CHECKOUT.value)
         if is_out:
-            user_id = log_vals[4]
-            checkout_user = (
-                self.db.getUser(user_id)[1]
-                if user_id
-                else log_vals[3]
-            )
-            checkout_time = log_vals[1]
+            checkout_user, checkout_time = self._parseLogs(log_vals)
         else:
             (checkout_user, checkout_time) = ('', '')
 
@@ -64,6 +68,12 @@ class BookService:
 
     def returnBook(self, isbn):
         self.db.putLog(isbn, Action.RETURN)
+
+    def listBookCheckoutHistory(self, isbn) -> list[tuple[int, str, str]]:
+        logs = self.db.listLogs(isbn)
+        logs = filter(lambda l: l[2] in [Action.CHECKOUT.value, Action.RETURN.value], logs)
+        logs = map(lambda l: (l[2],) + self._parseLogs(l), logs)
+        return list(logs)
 
     def listUsers(self):
         vals = self.db.listUsers()
