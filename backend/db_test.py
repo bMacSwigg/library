@@ -97,6 +97,22 @@ class TestDatabase(BaseTestCase):
 
         self.assertEqual(res, ('isbn1', '', 0, '', 0))
 
+    def test_logs_list(self):
+        self.db.putLog('isbn1', Action.CREATE, 1234)
+        time.sleep(1)  # Hack to keep the timestamps from colliding
+        self.db.putLog('isbn1', Action.CHECKOUT, 5678)
+        self.db.putLog('isbn2', Action.CREATE, 9001)
+
+        res = self.db.listLogs('isbn1')
+
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0][0], 'isbn1')
+        self.assertEqual(res[0][2], Action.CREATE.value)
+        self.assertEqual(res[0][4], 1234)
+        self.assertEqual(res[1][0], 'isbn1')
+        self.assertEqual(res[1][2], Action.CHECKOUT.value)
+        self.assertEqual(res[1][4], 5678)
+
     def test_user_putAndGet(self):
         self.db.putUser(1234, 'John Doe', 'john@example.com')
         res = self.db.getUser(1234)

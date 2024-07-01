@@ -72,6 +72,12 @@ class Database:
                  (self.LOGS_TABLENAME, isbn))
         return cur.execute(query).fetchone() or (isbn, '', Action.UNKNOWN.value, '', 0)
 
+    def listLogs(self, isbn: str):
+        cur = self.con.cursor()
+        query = ('SELECT * FROM %s WHERE Isbn="%s" ORDER BY Timestamp ASC' %
+                 (self.LOGS_TABLENAME, isbn))
+        return cur.execute(query).fetchall()
+
     def putUser(self, user_id, name, email):
         cur = self.con.cursor()
         query = ('INSERT INTO %s VALUES (%d, "%s", "%s")' %
