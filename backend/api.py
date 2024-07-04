@@ -4,6 +4,7 @@ from urllib.request import urlopen
 from backend.models import Book, User
 from backend.db import Action, Database
 from constants import *
+from notifs.mailgun_client import Email
 
 
 class NotFoundException(Exception):
@@ -12,10 +13,19 @@ class NotFoundException(Exception):
         self.message = message
         super().__init__(self.message)
 
+
+class InvalidStateException(Exception):
+
+    def __init__(self, message = ''):
+        self.message = message
+        super().__init__(self.message)
+
+
 class BookService:
 
     def __init__(self):
         self.db = Database(DB_FILE)
+        self.email = Email()
 
     def _parseLogs(self, log_vals: tuple) -> tuple[str, str]:
         user_id = log_vals[4]
@@ -62,12 +72,32 @@ class BookService:
                         book.category, book.year, book.thumbnail)
         self.db.putLog(book.isbn, Action.CREATE)
 
-    # TODO: Should these validate the current state of the book?
     def checkoutBook(self, isbn: str, user: User):
+        prev_log = self.db.getLatestLog(isbn)
+        if prev_log[2] == Action.CHECKOUT.value:
+            raise InvalidStateException('Book with ISBN %s already out' % isbn)
+
         self.db.putLog(isbn, Action.CHECKOUT, user.user_id)
 
+        book = self.getBook(isbn)
+        self.email.send_checkout_message(book, user)
+
     def returnBook(self, isbn):
+        checkout_log = self.db.getLatestLog(isbn)
+        if checkout_log[2] != Action.CHECKOUT.value:
+            raise InvalidStateException('Book with ISBN %s is not out' % isbn)
+
         self.db.putLog(isbn, Action.RETURN)
+
+        if not checkout_log[4]:
+            # no user ID means no email to notify
+            return
+        book = self.getBook(isbn)
+        user_vals = self.db.getUser(checkout_log[4])
+        user = User(user_vals[0], user_vals[1], user_vals[2])
+        ret_time = self.db.getLatestLog(isbn)[1]
+        self.email.send_return_message(book, user, ret_time)
+        
 
     def listBookCheckoutHistory(self, isbn) -> list[tuple[int, str, str]]:
         logs = self.db.listLogs(isbn)

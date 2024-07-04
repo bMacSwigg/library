@@ -1,10 +1,11 @@
 import unittest
 import time
 
-from backend.api import BookService, NotFoundException
+from backend.api import BookService, InvalidStateException, NotFoundException
 from backend.db import Action, Database
 from backend.models import Book, User
 from backend.testbase import BaseTestCase
+from notifs.mailgun_client import FakeEmail
 
 class TestBookService(BaseTestCase):
 
@@ -13,6 +14,7 @@ class TestBookService(BaseTestCase):
     def setUp(self):
         self.books = BookService()
         self.books.db = Database(self.TEST_DATABASE)
+        self.books.email = FakeEmail()
         with open('books.schema', 'r') as file:
             schema = file.read()
             self.books.db.con.cursor().executescript(schema)
@@ -168,6 +170,21 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res.checkout_user, 'user')
         self.assertAboutNow(res.checkout_time)
 
+    def test_checkoutBook_alreadyOut(self):
+        book = Book('isbn1', '', '', '', '', '')
+        self.books.createBook(book)
+        user = User(1234, 'user', 'user@example.com')
+        self.books.db.putUser(user.user_id, user.name, user.email)
+        time.sleep(1)
+        self.books.checkoutBook('isbn1', user)
+
+        with self.assertRaises(InvalidStateException):
+            self.books.checkoutBook('isbn1', user)
+
+    def test_checkoutBook_sendsEmail(self):
+        # TODO
+        return
+
     def test_returnBook(self):
         book = Book('isbn1', '', '', '', '', '')
         self.books.createBook(book)
@@ -183,6 +200,17 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res.is_out, False)
         self.assertEqual(res.checkout_user, '')
         self.assertEqual(res.checkout_time, '')
+
+    def test_returnBook_notOut(self):
+        book = Book('isbn1', '', '', '', '', '')
+        self.books.createBook(book)
+
+        with self.assertRaises(InvalidStateException):
+            self.books.returnBook('isbn1')
+
+    def test_returnBook_sendsEmail(self):
+        # TODO
+        return
 
     def test_listBookCheckoutHistory(self):
         self.books.createBook(Book('isbn1', '', '', '', '', ''))
