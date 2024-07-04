@@ -61,7 +61,7 @@ class Database:
 
     def putLog(self, isbn: str, action: Action, user_id: int = 0):
         cur = self.con.cursor()
-        query = ('INSERT INTO %s VALUES ("%s", datetime("now"), %s, "", %d)' %
+        query = ('INSERT INTO %s VALUES ("%s", datetime("now"), %s, %d)' %
                  (self.LOGS_TABLENAME, isbn, action.value, user_id))
         cur.execute(query)
         self.con.commit()
@@ -70,7 +70,7 @@ class Database:
         cur = self.con.cursor()
         query = ('SELECT * FROM %s WHERE Isbn="%s" ORDER BY Timestamp DESC LIMIT 1' %
                  (self.LOGS_TABLENAME, isbn))
-        return cur.execute(query).fetchone() or (isbn, '', Action.UNKNOWN.value, '', 0)
+        return cur.execute(query).fetchone() or (isbn, '', Action.UNKNOWN.value, 0)
 
     def listLogs(self, isbn: str):
         cur = self.con.cursor()

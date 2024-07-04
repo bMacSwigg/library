@@ -68,7 +68,7 @@ class TestDatabase(BaseTestCase):
 
         self.assertEqual(res[0], 'some-isbn')
         self.assertEqual(res[2], Action.CREATE.value)
-        self.assertEqual(res[4], 1234)
+        self.assertEqual(res[3], 1234)
         self.assertAboutNow(res[1])
 
     def test_logs_getsMostRecent(self):
@@ -80,7 +80,7 @@ class TestDatabase(BaseTestCase):
 
         self.assertEqual(res[0], 'some-isbn')
         self.assertEqual(res[2], Action.CHECKOUT.value)
-        self.assertEqual(res[4], 5678)
+        self.assertEqual(res[3], 5678)
 
     def test_logs_getsMatchingIsbn(self):
         self.db.putLog('isbn1', Action.CREATE, 1234)
@@ -90,12 +90,12 @@ class TestDatabase(BaseTestCase):
 
         self.assertEqual(res[0], 'isbn1')
         self.assertEqual(res[2], Action.CREATE.value)
-        self.assertEqual(res[4], 1234)
+        self.assertEqual(res[3], 1234)
 
     def test_logs_noneMatching(self):
         res = self.db.getLatestLog('isbn1')
 
-        self.assertEqual(res, ('isbn1', '', 0, '', 0))
+        self.assertEqual(res, ('isbn1', '', 0, 0))
 
     def test_logs_list(self):
         self.db.putLog('isbn1', Action.CREATE, 1234)
@@ -108,10 +108,10 @@ class TestDatabase(BaseTestCase):
         self.assertEqual(len(res), 2)
         self.assertEqual(res[0][0], 'isbn1')
         self.assertEqual(res[0][2], Action.CREATE.value)
-        self.assertEqual(res[0][4], 1234)
+        self.assertEqual(res[0][3], 1234)
         self.assertEqual(res[1][0], 'isbn1')
         self.assertEqual(res[1][2], Action.CHECKOUT.value)
-        self.assertEqual(res[1][4], 5678)
+        self.assertEqual(res[1][3], 5678)
 
     def test_user_putAndGet(self):
         self.db.putUser(1234, 'John Doe', 'john@example.com')

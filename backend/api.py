@@ -28,11 +28,11 @@ class BookService:
         self.email = Email()
 
     def _parseLogs(self, log_vals: tuple) -> tuple[str, str]:
-        user_id = log_vals[4]
+        user_id = log_vals[3]
         user = (
             self.db.getUser(user_id)[1]
             if user_id
-            else log_vals[3]
+            else ''
         )
         time = log_vals[1]
         return user, time
@@ -89,11 +89,8 @@ class BookService:
 
         self.db.putLog(isbn, Action.RETURN)
 
-        if not checkout_log[4]:
-            # no user ID means no email to notify
-            return
         book = self.getBook(isbn)
-        user = self.getUser(checkout_log[4])
+        user = self.getUser(checkout_log[3])
         ret_time = self.db.getLatestLog(isbn)[1]
         self.email.send_return_message(book, user, ret_time)
         
