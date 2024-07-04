@@ -4,6 +4,7 @@ from tkinter import ttk
 from backend.api import BookService
 from backend.db import Action
 from backend.models import Book
+from constants import *
 from ui.image_loader import CachedImageLoader
 
 class CheckoutHistory:
@@ -13,8 +14,8 @@ class CheckoutHistory:
         self.book = book
 
         self.root = Toplevel()
-        self.root.geometry("480x320")
-        self.root.title("Checkout History: %s" % book.title)
+        self.root.geometry(POPUP_WINDOW_SIZE)
+        self.root.title('Checkout History: %s' % book.title)
 
         logs = self.bs.listBookCheckoutHistory(book.isbn)
         for idx, log in enumerate(logs):
@@ -22,8 +23,6 @@ class CheckoutHistory:
                 self._checkout(idx, log[1], log[2])
             else:
                 self._return(idx, log[2])
-
-        self.root.mainloop()
 
     def _checkout(self, idx, user, time):
         txt = ('Checked out by %s at %s' % (user, time))
