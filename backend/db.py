@@ -72,10 +72,16 @@ class Database:
                  (self.LOGS_TABLENAME, isbn))
         return cur.execute(query).fetchone() or (isbn, '', Action.UNKNOWN.value, 0)
 
-    def listLogs(self, isbn: str):
+    def listLogsByIsbn(self, isbn: str):
         cur = self.con.cursor()
         query = ('SELECT * FROM %s WHERE Isbn="%s" ORDER BY Timestamp ASC' %
                  (self.LOGS_TABLENAME, isbn))
+        return cur.execute(query).fetchall()
+
+    def listLogsByUser(self, user_id: int):
+        cur = self.con.cursor()
+        query = ('SELECT * FROM %s WHERE UserId="%s" ORDER BY Timestamp ASC' %
+                 (self.LOGS_TABLENAME, user_id))
         return cur.execute(query).fetchall()
 
     def putUser(self, user_id, name, email):

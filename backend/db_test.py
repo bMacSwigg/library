@@ -97,13 +97,13 @@ class TestDatabase(BaseTestCase):
 
         self.assertEqual(res, ('isbn1', '', 0, 0))
 
-    def test_logs_list(self):
+    def test_logs_listByIsbn(self):
         self.db.putLog('isbn1', Action.CREATE, 1234)
         time.sleep(1)  # Hack to keep the timestamps from colliding
         self.db.putLog('isbn1', Action.CHECKOUT, 5678)
         self.db.putLog('isbn2', Action.CREATE, 9001)
 
-        res = self.db.listLogs('isbn1')
+        res = self.db.listLogsByIsbn('isbn1')
 
         self.assertEqual(len(res), 2)
         self.assertEqual(res[0][0], 'isbn1')
@@ -112,6 +112,22 @@ class TestDatabase(BaseTestCase):
         self.assertEqual(res[1][0], 'isbn1')
         self.assertEqual(res[1][2], Action.CHECKOUT.value)
         self.assertEqual(res[1][3], 5678)
+
+    def test_logs_listByUser(self):
+        self.db.putLog('isbn1', Action.CHECKOUT, 1234)
+        time.sleep(1)  # Hack to keep the timestamps from colliding
+        self.db.putLog('isbn2', Action.RETURN, 1234)
+        self.db.putLog('isbn3', Action.CHECKOUT, 5678)
+
+        res = self.db.listLogsByUser(1234)
+
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0][0], 'isbn1')
+        self.assertEqual(res[0][2], Action.CHECKOUT.value)
+        self.assertEqual(res[0][3], 1234)
+        self.assertEqual(res[1][0], 'isbn2')
+        self.assertEqual(res[1][2], Action.RETURN.value)
+        self.assertEqual(res[1][3], 1234)
 
     def test_user_putAndGet(self):
         self.db.putUser(1234, 'John Doe', 'john@example.com')

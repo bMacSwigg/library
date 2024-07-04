@@ -96,7 +96,7 @@ class BookService:
         self.email.send_return_message(book, user, ret_time)
 
     def listBookCheckoutHistory(self, isbn) -> list[tuple[int, str, str]]:
-        logs = self.db.listLogs(isbn)
+        logs = self.db.listLogsByIsbn(isbn)
         logs = filter(lambda l: l[2] in [Action.CHECKOUT.value, Action.RETURN.value], logs)
         logs = map(lambda l: (l[2],) + self._parseLogs(l), logs)
         return list(logs)
