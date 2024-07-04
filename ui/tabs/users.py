@@ -31,8 +31,17 @@ class UsersTab(BaseTab):
         self.error.grid(column=5, row=0)
     
     def _make(self):
+        # A small abuse of Treeview to make a table...
+        self.userslist = ttk.Treeview(self.tab, columns=('id', 'email'))
+        self.userslist.heading('id', text='User ID')
+        self.userslist.heading('email', text='Email')
+        users = self.bs.listUsers()
+        for u in users:
+            self.userslist.insert('', 'end', u.user_id, text=u.name, values=(u.user_id, u.email))
+        self.userslist.pack(side='top', fill='both', expand=True)
+
         self.newuserframe = ttk.Frame(self.tab)
-        self.newuserframe.pack(side='top', fill='x', expand=False)
+        self.newuserframe.pack(side='bottom', fill='x', expand=False)
         self.name = StringVar()
         nameLabel = ttk.Label(self.newuserframe, text="Name:")
         nameLabel.grid(column=0, row=0)
@@ -45,12 +54,3 @@ class UsersTab(BaseTab):
         emailEntry.grid(column=3, row=0)
         createbtn = ttk.Button(self.newuserframe, text='Create User', command=self._createUser)
         createbtn.grid(column=4, row=0)
-
-        # A small abuse of Treeview to make a table...
-        userslist = ttk.Treeview(self.tab, columns=('id', 'email'))
-        userslist.heading('id', text='User ID')
-        userslist.heading('email', text='Email')
-        users = self.bs.listUsers()
-        for u in users:
-            userslist.insert('', 'end', u.user_id, text=u.name, values=(u.user_id, u.email))
-        userslist.pack(side='bottom', fill='both', expand=True)
