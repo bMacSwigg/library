@@ -1,4 +1,6 @@
 import json
+import logging
+import re
 import requests
 
 from backend.models import Book, User
@@ -7,11 +9,15 @@ _MAILGUN_APIKEY_FILE = 'C:\\Users\\User\\Documents\\GitHub\\library\\notifs\\mai
 _EMAIL_FROM = 'Brian\'s Library <library@mcswiggen.me>'
 _CHECKOUT_TEMPLATE = 'Checkout Notification'
 _RETURN_TEMPLATE = 'Return Notification'
+# Could be better, but this is sufficient for now
+_VALID_EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 
 class Email:
 
     def __init__(self):
+        self.logger = logging.getLogger('email_logger')
+        logging.basicConfig(level=logging.WARNING)
         with open(_MAILGUN_APIKEY_FILE, 'r') as file:
             self.api_key = file.read()
 
@@ -46,6 +52,10 @@ class Email:
         self.send_message([user.email], subject, _RETURN_TEMPLATE, subs)
 
     def send_message(self, to_emails, subject, template, substitutions):
+        to_emails = filter(self._validate_email, to_emails)
+        if not to_emails:
+            self.logger.warning('No valid emails; skipping notification')
+            return
         subs = json.dumps(substitutions)
         resp = requests.post(
             'https://api.mailgun.net/v3/mg.mcswiggen.me/messages',
@@ -64,6 +74,12 @@ class Email:
                 True, 'Brian', 'Some time')
         user = User(1, 'Brian McSwiggen', 'brian.mcswiggen@gmail.com')
         self.send_checkout_message(book, user)
+
+    def _validate_email(self, email):
+        if re.search(_VALID_EMAIL_PATTERN, email) is None:
+            self.logger.warning('"%s" is not a valid email address' % email)
+            return False
+        return True
 
 
 class FakeEmail(Email):
