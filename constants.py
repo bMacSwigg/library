@@ -7,4 +7,6 @@ METADATA_STYLE = 'Metadata.TLabel'
 MIN_USER_ID = 100000
 MAX_USER_ID = 999999
 
+POPUP_WINDOW_SIZE = '480x320'
+
 DB_FILE = 'C:\\Users\\User\\Documents\\GitHub\\library\\backend\\books.db'

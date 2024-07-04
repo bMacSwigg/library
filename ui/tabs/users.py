@@ -5,6 +5,7 @@ from tkinter import ttk
 from backend.models import User
 from constants import *
 from ui.tabs.base import BaseTab
+from ui.user_activity import UserActivity
 
 
 class UsersTab(BaseTab):
@@ -29,7 +30,11 @@ class UsersTab(BaseTab):
         self.error = ttk.Label(self.newuserframe, text=('Error: %s' % msg))
         self.error.configure(style=ERROR_STYLE)
         self.error.grid(column=5, row=0)
-    
+
+    def _openUserDetails(self, event):
+        for user_id in self.userslist.selection():
+            UserActivity(self.bs, int(user_id))
+
     def _make(self):
         # A small abuse of Treeview to make a table...
         self.userslist = ttk.Treeview(self.tab, columns=('id', 'email'))
@@ -39,6 +44,8 @@ class UsersTab(BaseTab):
         for u in users:
             self.userslist.insert('', 'end', u.user_id, text=u.name, values=(u.user_id, u.email))
         self.userslist.pack(side='top', fill='both', expand=True)
+        self.userslist.bind('<Double-Button-1>', self._openUserDetails)
+        self.userslist.bind('<Return>', self._openUserDetails)
 
         self.newuserframe = ttk.Frame(self.tab)
         self.newuserframe.pack(side='bottom', fill='x', expand=False)
