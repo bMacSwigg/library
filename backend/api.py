@@ -93,8 +93,7 @@ class BookService:
             # no user ID means no email to notify
             return
         book = self.getBook(isbn)
-        user_vals = self.db.getUser(checkout_log[4])
-        user = User(user_vals[0], user_vals[1], user_vals[2])
+        user = self.getUser(checkout_log[4])
         ret_time = self.db.getLatestLog(isbn)[1]
         self.email.send_return_message(book, user, ret_time)
         
@@ -105,10 +104,14 @@ class BookService:
         logs = map(lambda l: (l[2],) + self._parseLogs(l), logs)
         return list(logs)
 
+    def getUser(self, user_id: int) -> User:
+        user_vals = self.db.getUser(user_id)
+        return User(user_vals[0], user_vals[1], user_vals[2])
+
     def createUser(self, user: User):
         self.db.putUser(user.user_id, user.name, user.email)
 
-    def listUsers(self):
+    def listUsers(self) -> list[User]:
         vals = self.db.listUsers()
         return [User(v[0], v[1], v[2]) for v in vals]
 

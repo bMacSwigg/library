@@ -232,7 +232,23 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res[1][0], Action.RETURN.value)
         self.assertEqual(res[1][1], '')
         self.assertAboutNow(res[1][2])
-        
+
+    def test_getUser(self):
+        self.books.db.putUser(1234, 'Brian', 'me@example.com')
+
+        res = self.books.getUser(1234)
+
+        self.assertEqual(res.user_id, 1234)
+        self.assertEqual(res.name, 'Brian')
+        self.assertEqual(res.email, 'me@example.com')
+
+    def test_createUser(self):
+        user = User(1234, 'Brian', 'me@example.com')
+
+        self.books.createUser(user)
+        res = self.books.getUser(1234)
+
+        self.assertEqual(res, user)
 
     def test_listUsers(self):
         self.books.db.putUser(1234, 'Brian', 'me@example.com')
