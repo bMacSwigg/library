@@ -42,7 +42,7 @@ class CirculationTab(BaseTab):
         self._clearError()
         self.error = ttk.Label(self.lookupframe, text=('Error: %s' % msg))
         self.error.configure(style=ERROR_STYLE)
-        self.error.grid(column=3, row=0)
+        self.error.grid(column=4, row=0)
 
     def _make(self):
         self.lookupframe = ttk.Frame(self.tab)
