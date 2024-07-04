@@ -94,7 +94,6 @@ class BookService:
         user = self.getUser(user_id)
         ret_time = self.db.getLatestLog(isbn)[1]
         self.email.send_return_message(book, user, ret_time)
-        
 
     def listBookCheckoutHistory(self, isbn) -> list[tuple[int, str, str]]:
         logs = self.db.listLogs(isbn)

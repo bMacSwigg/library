@@ -52,7 +52,7 @@ class Email:
         self.send_message([user.email], subject, _RETURN_TEMPLATE, subs)
 
     def send_message(self, to_emails, subject, template, substitutions):
-        to_emails = filter(self._validate_email, to_emails)
+        to_emails = list(filter(self._validate_email, to_emails))
         if not to_emails:
             self.logger.warning('No valid emails; skipping notification')
             return
