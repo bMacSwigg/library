@@ -196,10 +196,14 @@ class TestBookService(BaseTestCase):
         self.books.returnBook('isbn1')
 
         res = self.books.getBook('isbn1')
+        log = self.books.db.getLatestLog('isbn1')
 
         self.assertEqual(res.is_out, False)
         self.assertEqual(res.checkout_user, '')
         self.assertEqual(res.checkout_time, '')
+        self.assertAboutNow(log[1])
+        self.assertEqual(log[2], Action.RETURN.value)
+        self.assertEqual(log[3], 1234)
 
     def test_returnBook_notOut(self):
         book = Book('isbn1', '', '', '', '', '')
@@ -230,7 +234,7 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res[0][1], 'user')
         self.assertAboutNow(res[0][2])
         self.assertEqual(res[1][0], Action.RETURN.value)
-        self.assertEqual(res[1][1], '')
+        self.assertEqual(res[1][1], 'user')
         self.assertAboutNow(res[1][2])
 
     def test_getUser(self):

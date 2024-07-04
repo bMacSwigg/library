@@ -87,10 +87,11 @@ class BookService:
         if checkout_log[2] != Action.CHECKOUT.value:
             raise InvalidStateException('Book with ISBN %s is not out' % isbn)
 
-        self.db.putLog(isbn, Action.RETURN)
+        user_id = checkout_log[3]
+        self.db.putLog(isbn, Action.RETURN, user_id)
 
         book = self.getBook(isbn)
-        user = self.getUser(checkout_log[3])
+        user = self.getUser(user_id)
         ret_time = self.db.getLatestLog(isbn)[1]
         self.email.send_return_message(book, user, ret_time)
         
