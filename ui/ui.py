@@ -18,24 +18,10 @@ from ui.hinted_entry import HintedEntry, HintedStringVar
 from ui.image_loader import CachedImageLoader
 # Embarrassing for Tk that this needs a custom impl
 from ui.scrollable import ScrollFrame
+from ui.tabs.base import BaseTab
 
 
-class _BaseTab:
-
-    def __init__(self, tab: ttk.Frame, bs: BookService):
-        self.tab = tab
-        self.bs = bs
-
-    def _make(self):
-        pass
-
-    def refresh(self):
-        for child in self.tab.winfo_children():
-            child.destroy()
-        self._make()
-
-
-class CatalogTab(_BaseTab):
+class CatalogTab(BaseTab):
 
     def __init__(self, tab, bs, cil):
         super().__init__(tab, bs)
@@ -69,7 +55,7 @@ class CatalogTab(_BaseTab):
         self.initialLoad = False
 
 
-class CirculationTab(_BaseTab):
+class CirculationTab(BaseTab):
 
     def __init__(self, tab, bs, cil):
         super().__init__(tab, bs)
@@ -127,7 +113,7 @@ class CirculationTab(_BaseTab):
         self.bookframe = scrollframe.viewPort
 
 
-class ImportTab(_BaseTab):
+class ImportTab(BaseTab):
 
     def __init__(self, tab, bs, ls):
         super().__init__(tab, bs)
@@ -219,7 +205,7 @@ class ImportTab(_BaseTab):
         create.grid(column=0, row=6, columnspan=2)
 
 
-class UsersTab(_BaseTab):
+class UsersTab(BaseTab):
 
     def _createUser(self):
         name = self.name.get()
