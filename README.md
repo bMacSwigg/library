@@ -5,10 +5,13 @@ Personal library catalog
 
 Add this project directory to the PYTHONPATH, to ensure imports work.
 
-Install PIL, which is needed for displaying images:
+Install dependencies:
+*  Pillow, which is needed for displaying images
+*  mailgun, which is needed for sending emails
+*  sendgrid, which could be used for sending emails, if it was a good product
 
 ```
-pip install Pillow
+pip install -r requirements.txt
 ```
 
 To create a DB based off the schema (if one doesn't already exist), use the
