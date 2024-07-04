@@ -82,7 +82,7 @@ class BookService:
         book = self.getBook(isbn)
         self.email.send_checkout_message(book, user)
 
-    def returnBook(self, isbn):
+    def returnBook(self, isbn: str):
         checkout_log = self.db.getLatestLog(isbn)
         if checkout_log[2] != Action.CHECKOUT.value:
             raise InvalidStateException('Book with ISBN %s is not out' % isbn)
@@ -95,10 +95,15 @@ class BookService:
         ret_time = self.db.getLatestLog(isbn)[1]
         self.email.send_return_message(book, user, ret_time)
 
-    def listBookCheckoutHistory(self, isbn) -> list[tuple[int, str, str]]:
+    def listBookCheckoutHistory(self, isbn: str) -> list[tuple[int, str, str]]:
         logs = self.db.listLogsByIsbn(isbn)
         logs = filter(lambda l: l[2] in [Action.CHECKOUT.value, Action.RETURN.value], logs)
         logs = map(lambda l: (l[2],) + self._parseLogs(l), logs)
+        return list(logs)
+
+    def listUserCheckoutHistory(self, user_id: int) -> list[tuple[str, str, int, int]]:
+        logs = self.db.listLogsByUser(user_id)
+        logs = filter(lambda l: l[2] in [Action.CHECKOUT.value, Action.RETURN.value], logs)
         return list(logs)
 
     def getUser(self, user_id: int) -> User:

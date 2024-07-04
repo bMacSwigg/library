@@ -237,6 +237,31 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res[1][1], 'user')
         self.assertAboutNow(res[1][2])
 
+    def test_listUserCheckoutHistory(self):
+        self.books.createBook(Book('isbn1', '', '', '', '', ''))
+        self.books.createBook(Book('isbn2', '', '', '', '', ''))
+        user = User(1234, 'user', 'user@example.com')
+        other = User(5678, 'other', 'other@example.com')
+        self.books.createUser(user)
+        self.books.createUser(other)
+        time.sleep(1)
+        self.books.checkoutBook('isbn1', user)
+        time.sleep(1)
+        self.books.returnBook('isbn1')
+        self.books.checkoutBook('isbn2', other)
+
+        res = self.books.listUserCheckoutHistory(1234)
+
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0][0], 'isbn1')
+        self.assertAboutNow(res[0][1])
+        self.assertEqual(res[0][2], Action.CHECKOUT.value)
+        self.assertEqual(res[0][3], 1234)
+        self.assertEqual(res[1][0], 'isbn1')
+        self.assertAboutNow(res[1][1])
+        self.assertEqual(res[1][2], Action.RETURN.value)
+        self.assertEqual(res[1][3], 1234)
+
     def test_getUser(self):
         self.books.db.putUser(1234, 'Brian', 'me@example.com')
 
