@@ -2,8 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from backend.api import BookService
-from backend.db import Action
-from backend.models import Book
+from backend.models import Book, Action
 from constants import *
 from ui.image_loader import CachedImageLoader
 
@@ -19,10 +18,10 @@ class CheckoutHistory:
 
         logs = self.bs.listBookCheckoutHistory(book.isbn)
         for idx, log in enumerate(logs):
-            if log[0] == Action.CHECKOUT.value:
-                self._checkout(idx, log[1], log[2])
+            if log.action == Action.CHECKOUT:
+                self._checkout(idx, log.user_name, log.timestamp)
             else:
-                self._return(idx, log[2])
+                self._return(idx, log.timestamp)
 
     def _checkout(self, idx, user, time):
         txt = ('Checked out by %s at %s' % (user, time))

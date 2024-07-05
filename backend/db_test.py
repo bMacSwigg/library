@@ -2,7 +2,8 @@ import unittest
 from datetime import datetime, UTC
 import time
 
-from backend.db import Action, Database
+from backend.db import Database
+from backend.models import Action
 from backend.testbase import BaseTestCase
 
 class TestDatabase(BaseTestCase):

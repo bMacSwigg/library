@@ -1,18 +1,19 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService
+from backend.api import BookService, UserService
 from backend.models import Book
 from ui.book_details import InteractiveBookDetails
 from ui.image_loader import CachedImageLoader
 
 class BookList:
 
-    def __init__(self, frame: ttk.Frame, books: list[Book],
-                 bs: BookService, cil: CachedImageLoader):
+    def __init__(self, frame: ttk.Frame, books: list[Book], bs: BookService,
+                 us: UserService, cil: CachedImageLoader):
         self.frame = frame
         self.books = books
         self.bs = bs
+        self.us = us
         self.cil = cil
 
     def display(self, showLoadingBar: bool):
@@ -28,7 +29,7 @@ class BookList:
         # Load data
         rows = []
         for i,book in enumerate(self.books):
-            bd = InteractiveBookDetails(self.frame, i, book, self.cil, self.bs)
+            bd = InteractiveBookDetails(self.frame, i, book, self.cil, self.bs, self.us)
             rows.append(bd)
             if showLoadingBar:
                 progressbar.step(1)

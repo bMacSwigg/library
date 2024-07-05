@@ -1,6 +1,6 @@
 from tkinter import ttk
 
-from backend.api import BookService
+from backend.api import BookService, UserService
 from backend.models import Book
 from ui.book_list import BookList
 from ui.hinted_entry import HintedEntry, HintedStringVar
@@ -11,8 +11,10 @@ from ui.tabs.base import BaseTab
 class CatalogTab(BaseTab):
     """Main tab, for showing the full catalog & searching for books"""
 
-    def __init__(self, tab: ttk.Frame, bs: BookService, cil: CachedImageLoader):
+    def __init__(self, tab: ttk.Frame, bs: BookService, us: UserService,
+                 cil: CachedImageLoader):
         super().__init__(tab, bs)
+        self.us = us
         self.cil = cil
         self.initialLoad = True
         self.books = None
@@ -38,6 +40,6 @@ class CatalogTab(BaseTab):
         scrollframe = ScrollFrame(self.tab)
         scrollframe.pack(side='bottom', fill='both', expand=True)
         self.books = BookList(scrollframe.viewPort, self._getBooks(),
-                              self.bs, self.cil)
+                              self.bs, self.us, self.cil)
         self.books.display(self.initialLoad)
         self.initialLoad = False

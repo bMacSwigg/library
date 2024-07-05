@@ -1,8 +1,9 @@
 import json
+import random
 from urllib.request import urlopen
 
-from backend.models import Book, User
-from backend.db import Action, Database
+from backend.models import Book, User, Action, LogEntry
+from backend.db import Database
 from constants import *
 from notifs.mailgun_client import Email
 
@@ -27,20 +28,21 @@ class BookService:
         self.db = Database(DB_FILE)
         self.email = Email()
 
-    def _parseLogs(self, log_vals: tuple) -> tuple[str, str]:
-        user_id = log_vals[3]
+    def _parseLogs(self, log_vals: tuple) -> LogEntry:
+        user_id = log_vals[3] or None
         user = (
             self.db.getUser(user_id)[1]
             if user_id
-            else ''
+            else None
         )
-        time = log_vals[1]
-        return user, time
+        action = Action(log_vals[2])
+        return LogEntry(log_vals[0], log_vals[1], action, user_id, user)
 
     def _bookFromTuple(self, book_vals: tuple, log_vals: tuple) -> Book:
-        is_out = (log_vals[2] == Action.CHECKOUT.value)
+        log = self._parseLogs(log_vals)
+        is_out = (log.action == Action.CHECKOUT)
         if is_out:
-            checkout_user, checkout_time = self._parseLogs(log_vals)
+            checkout_user, checkout_time = log.user_name, log.timestamp
         else:
             (checkout_user, checkout_time) = ('', '')
 
@@ -91,27 +93,38 @@ class BookService:
         self.db.putLog(isbn, Action.RETURN, user_id)
 
         book = self.getBook(isbn)
-        user = self.getUser(user_id)
+        user_vals = self.db.getUser(user_id)
+        user = User(user_vals[0], user_vals[1], user_vals[2])
         ret_time = self.db.getLatestLog(isbn)[1]
         self.email.send_return_message(book, user, ret_time)
 
-    def listBookCheckoutHistory(self, isbn: str) -> list[tuple[int, str, str]]:
+    def listBookCheckoutHistory(self, isbn: str) -> list[LogEntry]:
         logs = self.db.listLogsByIsbn(isbn)
-        logs = filter(lambda l: l[2] in [Action.CHECKOUT.value, Action.RETURN.value], logs)
-        logs = map(lambda l: (l[2],) + self._parseLogs(l), logs)
+        logs = map(self._parseLogs, logs)
+        logs = filter(lambda l: l.action in [Action.CHECKOUT, Action.RETURN], logs)
         return list(logs)
 
-    def listUserCheckoutHistory(self, user_id: int) -> list[tuple[str, str, int, int]]:
+    def listUserCheckoutHistory(self, user_id: int) -> list[LogEntry]:
         logs = self.db.listLogsByUser(user_id)
-        logs = filter(lambda l: l[2] in [Action.CHECKOUT.value, Action.RETURN.value], logs)
+        logs = map(self._parseLogs, logs)
+        logs = filter(lambda l: l.action in [Action.CHECKOUT, Action.RETURN], logs)
         return list(logs)
+
+
+class UserService:
+
+    def __init__(self):
+        self.db = Database(DB_FILE)
 
     def getUser(self, user_id: int) -> User:
         user_vals = self.db.getUser(user_id)
         return User(user_vals[0], user_vals[1], user_vals[2])
 
-    def createUser(self, user: User):
+    def createUser(self, name: str, email: str) -> User:
+        user_id = random.randint(MIN_USER_ID, MAX_USER_ID)
+        user = User(user_id, name, email)
         self.db.putUser(user.user_id, user.name, user.email)
+        return user
 
     def listUsers(self) -> list[User]:
         vals = self.db.listUsers()
