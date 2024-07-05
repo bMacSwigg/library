@@ -123,8 +123,6 @@ class HistoricBookDetails(BasicBookDetails):
                  cil: CachedImageLoader, out_time: str,
                  ret_time: str|None = None):
         super().__init__(frame, ind, book, cil)
-        print(book.thumbnail)
-        print(self.img)
         self.out_time = out_time
         self.ret_time = ret_time
 
@@ -138,10 +136,6 @@ class HistoricBookDetails(BasicBookDetails):
             ret = ttk.Label(frame, text=ret_txt, wraplength=300)
             ret.grid(column=0, row=5, sticky=W)
             ret.configure(style=METADATA_STYLE)
-
-    def _make(self):
-        super()._make()
-        print(self.frames)
 
 
 # TODO: Get this working
