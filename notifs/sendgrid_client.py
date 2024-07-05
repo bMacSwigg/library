@@ -2,7 +2,7 @@ from python_http_client.exceptions import HTTPError
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from backend.models import Book, User
+from library.backend.models import Book, User
 
 _SENDGRID_APIKEY_FILE = 'C:\\Users\\User\\Documents\\GitHub\\library\\notifs\\sendgrid.secret'
 _EMAIL_FROM = 'library@mcswiggen.me'

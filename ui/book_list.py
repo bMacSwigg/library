@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, UserService
-from backend.models import Book
-from ui.book_details import InteractiveBookDetails
-from ui.image_loader import CachedImageLoader
+from library.backend.api import BookService, UserService
+from library.backend.models import Book
+from library.ui.book_details import InteractiveBookDetails
+from library.ui.image_loader import CachedImageLoader
 
 class BookList:
 

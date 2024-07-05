@@ -1,6 +1,6 @@
 import unittest
 
-from notifs.mailgun_client import Email
+from library.notifs.mailgun_client import Email
 
 class TestMailgunClient(unittest.TestCase):
 

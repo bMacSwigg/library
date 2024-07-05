@@ -2,13 +2,13 @@ import io
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, LookupService, UserService
-from constants import *
-from ui.image_loader import CachedImageLoader
-from ui.tabs.catalog import CatalogTab
-from ui.tabs.circulation import CirculationTab
-from ui.tabs.import_tab import ImportTab
-from ui.tabs.users import UsersTab
+from library.backend.api import BookService, LookupService, UserService
+from library.constants import *
+from library.ui.image_loader import CachedImageLoader
+from library.ui.tabs.catalog import CatalogTab
+from library.ui.tabs.circulation import CirculationTab
+from library.ui.tabs.import_tab import ImportTab
+from library.ui.tabs.users import UsersTab
 
 
 class AppWindow:

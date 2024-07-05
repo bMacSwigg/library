@@ -1,7 +1,7 @@
 import logging
 import sqlite3
 
-from backend.models import Action
+from library.backend.models import Action
 
 
 class Database:

@@ -1,12 +1,12 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, UserService
-from backend.models import Action, LogEntry
-from constants import *
-from ui.book_details import HistoricBookDetails
-from ui.image_loader import CachedImageLoader
-from ui.scrollable import ScrollFrame
+from library.backend.api import BookService, UserService
+from library.backend.models import Action, LogEntry
+from library.constants import *
+from library.ui.book_details import HistoricBookDetails
+from library.ui.image_loader import CachedImageLoader
+from library.ui.scrollable import ScrollFrame
 
 
 class UserActivity:
