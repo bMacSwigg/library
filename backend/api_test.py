@@ -1,3 +1,4 @@
+import os
 import unittest
 import time
 
@@ -14,7 +15,8 @@ class TestBookService(BaseTestCase):
 
     def setUp(self):
         self.db = Database(TEST_DATABASE)
-        with open('books.schema', 'r') as file:
+        schema_path = os.path.join(os.path.split(__file__)[0], 'books.schema')
+        with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)
         self.books = BookService()
@@ -274,7 +276,8 @@ class TestUserService(BaseTestCase):
 
     def setUp(self):
         self.db = Database(TEST_DATABASE)
-        with open('books.schema', 'r') as file:
+        schema_path = os.path.join(os.path.split(__file__)[0], 'books.schema')
+        with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)
         self.users = UserService()

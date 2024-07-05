@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import datetime, UTC
 import time
@@ -12,7 +13,8 @@ class TestDatabase(BaseTestCase):
 
     def setUp(self):
         self.db = Database(self.TEST_DATABASE)
-        with open('books.schema', 'r') as file:
+        schema_path = os.path.join(os.path.split(__file__)[0], 'books.schema')
+        with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)
 
