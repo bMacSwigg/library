@@ -6,6 +6,7 @@ from backend.db import Action
 from constants import *
 from ui.book_details import HistoricBookDetails
 from ui.image_loader import CachedImageLoader
+from ui.scrollable import ScrollFrame
 
 
 class UserActivity:
@@ -18,18 +19,21 @@ class UserActivity:
         self.root = Toplevel()
         self.root.geometry(POPUP_WINDOW_SIZE)
         self.root.title('User Activity: %s (%d)' % (self.user.name, user_id))
+        scrollframe = ScrollFrame(self.root)
+        scrollframe.pack(side='bottom', fill='both', expand=True)
+        vp = scrollframe.viewPort
 
         out, back = self._partition_user_logs(user_id)
 
-        out_label = ttk.Label(self.root, text='Currently checked out')
+        out_label = ttk.Label(vp, text='Currently checked out')
         out_label.grid(column=0, row=0, sticky=W)
-        out_frame = ttk.Frame(self.root)
+        out_frame = ttk.Frame(vp)
         out_frame.grid(column=0, row=1, sticky=W)
         self.out_rows = self._display_outs(out_frame, out)
 
-        back_label = ttk.Label(self.root, text='Previously borrowed')
+        back_label = ttk.Label(vp, text='Previously borrowed')
         back_label.grid(column=0, row=2, sticky=W)
-        back_frame = ttk.Frame(self.root)
+        back_frame = ttk.Frame(vp)
         back_frame.grid(column=0, row=3, sticky=W)
         self.back_rows = self._display_backs(back_frame, back)
 
