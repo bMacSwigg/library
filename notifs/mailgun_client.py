@@ -3,7 +3,7 @@ import logging
 import re
 import requests
 
-from backend.models import Book, User
+from library.backend.models import Book, User
 
 _MAILGUN_APIKEY_FILE = 'C:\\Users\\User\\Documents\\GitHub\\library\\notifs\\mailgun.secret'
 _EMAIL_FROM = 'Brian\'s Library <library@mcswiggen.me>'

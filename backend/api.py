@@ -2,10 +2,10 @@ import json
 import random
 from urllib.request import urlopen
 
-from backend.models import Book, User, Action, LogEntry
-from backend.db import Database
-from constants import *
-from notifs.mailgun_client import Email
+from library.backend.models import Book, User, Action, LogEntry
+from library.backend.db import Database
+from library.constants import *
+from library.notifs.mailgun_client import Email
 
 
 class NotFoundException(Exception):

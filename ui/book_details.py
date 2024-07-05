@@ -7,12 +7,12 @@ from tkinter.messagebox import askokcancel
 from tkinter.simpledialog import askstring
 import urllib.request
 
-from backend.api import BookService, UserService
-from backend.models import Book
-from constants import *
-from ui.checkout_history import CheckoutHistory
-from ui.combobox_dialog import askcombo
-from ui.image_loader import CachedImageLoader
+from library.backend.api import BookService, UserService
+from library.backend.models import Book
+from library.constants import *
+from library.ui.checkout_history import CheckoutHistory
+from library.ui.combobox_dialog import askcombo
+from library.ui.image_loader import CachedImageLoader
 
 
 class BasicBookDetails:

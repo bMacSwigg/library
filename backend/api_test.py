@@ -1,12 +1,12 @@
 import unittest
 import time
 
-from backend.api import BookService, UserService, InvalidStateException, NotFoundException
-from backend.db import Database
-from backend.models import Book, User, Action
-from backend.testbase import BaseTestCase
-from constants import *
-from notifs.mailgun_client import FakeEmail
+from library.backend.api import BookService, UserService, InvalidStateException, NotFoundException
+from library.backend.db import Database
+from library.backend.models import Book, User, Action
+from library.backend.testbase import BaseTestCase
+from library.constants import *
+from library.notifs.mailgun_client import FakeEmail
 
 TEST_DATABASE = ':memory:'
 

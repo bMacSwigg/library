@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService
-from backend.models import Book, Action
-from constants import *
-from ui.image_loader import CachedImageLoader
+from library.backend.api import BookService
+from library.backend.models import Book, Action
+from library.constants import *
+from library.ui.image_loader import CachedImageLoader
 
 class CheckoutHistory:
 
