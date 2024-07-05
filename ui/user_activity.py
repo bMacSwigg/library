@@ -26,17 +26,21 @@ class UserActivity:
         out, back = self._partition_user_logs(user_id)
 
         out_label = ttk.Label(vp, text='Currently checked out')
-        out_label.grid(column=0, row=0, sticky=W)
+        out_label.grid(column=0, row=0, sticky=W, pady=(0,10))
+        out_label.configure(style=HEADER_STYLE)
         out_frame = ttk.Frame(vp)
         out_frame.grid(column=0, row=1, sticky=W)
         self.out_rows = self._display_outs(out_frame, out)
 
         back_label = ttk.Label(vp, text='Previously borrowed')
-        back_label.grid(column=0, row=2, sticky=W)
+        back_label.grid(column=0, row=2, sticky=W, pady=(0,10))
+        back_label.configure(style=HEADER_STYLE)
         back_frame = ttk.Frame(vp)
         back_frame.grid(column=0, row=3, sticky=W)
         self.back_rows = self._display_backs(back_frame, back)
 
+        # This is... mostly just structured this way because we have to hold
+        # onto a reference to the various rows, so Tkinter doesn't GC the images
         for r in (self.out_rows + self.back_rows):
             r.refresh()
 
