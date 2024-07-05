@@ -38,6 +38,7 @@ class AppWindow:
         ttk.Style().configure(TITLE_STYLE, font=('Arial', 14, 'bold'))
         ttk.Style().configure(AUTHOR_STYLE, font=('Arial', 10, 'italic'))
         ttk.Style().configure(METADATA_STYLE, font=('Arial', 10))
+        ttk.Style().configure(HEADER_STYLE, font=('Arial', 14))
 
         mainframe = ttk.Frame(root, padding="3 3 12 12")
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -59,6 +60,6 @@ class AppWindow:
         self.catalogTab = CatalogTab(tabCatalog, self.bs, self.cil)
         self.circulationTab = CirculationTab(tabCirculation, self.bs, self.cil)
         self.importTab = ImportTab(tabImport, self.bs, self.ls)
-        self.usersTab = UsersTab(tabUsers, self.bs)
+        self.usersTab = UsersTab(tabUsers, self.bs, self.cil)
 
         root.mainloop()
