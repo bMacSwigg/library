@@ -66,7 +66,7 @@ class UserActivity:
         rows = []
         for idx, o in enumerate(out):
             book = self.bs.getBook(o[0][0])
-            out_time = o[0][0]
+            out_time = o[0][1]
             hbd = HistoricBookDetails(frame, idx, book, self.cil, out_time)
             rows.append(hbd)
         return rows
