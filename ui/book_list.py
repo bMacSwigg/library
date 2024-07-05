@@ -3,7 +3,7 @@ from tkinter import ttk
 
 from backend.api import BookService
 from backend.models import Book
-from ui.book_details import BookDetails
+from ui.book_details import InteractiveBookDetails
 from ui.image_loader import CachedImageLoader
 
 class BookList:
@@ -28,7 +28,7 @@ class BookList:
         # Load data
         rows = []
         for i,book in enumerate(self.books):
-            bd = BookDetails(self.frame, i, self.bs, book, self.cil)
+            bd = InteractiveBookDetails(self.frame, i, book, self.cil, self.bs)
             rows.append(bd)
             if showLoadingBar:
                 progressbar.step(1)

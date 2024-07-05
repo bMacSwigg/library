@@ -59,6 +59,6 @@ class AppWindow:
         self.catalogTab = CatalogTab(tabCatalog, self.bs, self.cil)
         self.circulationTab = CirculationTab(tabCirculation, self.bs, self.cil)
         self.importTab = ImportTab(tabImport, self.bs, self.ls)
-        self.usersTab = UsersTab(tabUsers, self.bs)
+        self.usersTab = UsersTab(tabUsers, self.bs, self.cil)
 
         root.mainloop()

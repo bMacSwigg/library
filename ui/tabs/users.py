@@ -2,13 +2,20 @@ import random
 from tkinter import *
 from tkinter import ttk
 
+from backend.api import BookService
 from backend.models import User
 from constants import *
+from ui.image_loader import CachedImageLoader
 from ui.tabs.base import BaseTab
 from ui.user_activity import UserActivity
 
 
 class UsersTab(BaseTab):
+
+    def __init__(self, tab: ttk.Frame, bs: BookService, cil: CachedImageLoader):
+        super().__init__(tab, bs)
+        self.cil = cil
+        self.ua_list = []
 
     def _createUser(self):
         name = self.name.get()
@@ -33,7 +40,11 @@ class UsersTab(BaseTab):
 
     def _openUserDetails(self, event):
         for user_id in self.userslist.selection():
-            UserActivity(self.bs, int(user_id))
+            ua = UserActivity(self.bs, self.cil, int(user_id))
+            # We have to keep a handle on these, so tkinter doesn't GC the image
+            # This produces a small leak, since we can't easily remove these
+            # from the list, even after they've been closed
+            self.ua_list.append(ua)
 
     def _make(self):
         # A small abuse of Treeview to make a table...
