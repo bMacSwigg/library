@@ -5,8 +5,7 @@ from library.notifs.mailgun_client import Email
 class TestMailgunClient(unittest.TestCase):
 
     def setUp(self):
-        self.email = Email()
-        self.email.api_key = ''  # ensure we don't send any actual emails
+        self.email = Email(keyfile='')  # ensure we don't send any actual emails
 
     def test_validate_email(self):
         self.assertTrue(self.email._validate_email('jon.doe123@gmail.com'))

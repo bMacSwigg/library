@@ -15,11 +15,15 @@ _VALID_EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 class Email:
 
-    def __init__(self):
+    def __init__(self, keyfile=_MAILGUN_APIKEY_FILE):
         self.logger = logging.getLogger('email_logger')
         logging.basicConfig(level=logging.WARNING)
-        with open(_MAILGUN_APIKEY_FILE, 'r') as file:
-            self.api_key = file.read()
+        try:
+            with open(keyfile, 'r') as file:
+                self.api_key = file.read()
+        except FileNotFoundError as e:
+            self.logger.error('Could not load API key', exc_info=e)
+            self.api_key = ''
 
     def send_checkout_message(self, book: Book, user: User):
         subs = {
