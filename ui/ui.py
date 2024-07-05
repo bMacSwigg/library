@@ -2,7 +2,7 @@ import io
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, LookupService
+from backend.api import BookService, LookupService, UserService
 from constants import *
 from ui.image_loader import CachedImageLoader
 from ui.tabs.catalog import CatalogTab
@@ -16,6 +16,7 @@ class AppWindow:
     def __init__(self):
         self.bs = BookService()
         self.ls = LookupService()
+        self.us = UserService()
         self.cil = CachedImageLoader()
 
     def refreshCurrentTab(self, event):
@@ -57,9 +58,9 @@ class AppWindow:
         self.tabs.pack(expand=1, fill='both')
         self.tabs.bind('<<NotebookTabChanged>>', self.refreshCurrentTab)
 
-        self.catalogTab = CatalogTab(tabCatalog, self.bs, self.cil)
-        self.circulationTab = CirculationTab(tabCirculation, self.bs, self.cil)
+        self.catalogTab = CatalogTab(tabCatalog, self.bs, self.us, self.cil)
+        self.circulationTab = CirculationTab(tabCirculation, self.bs, self.us, self.cil)
         self.importTab = ImportTab(tabImport, self.bs, self.ls)
-        self.usersTab = UsersTab(tabUsers, self.bs, self.cil)
+        self.usersTab = UsersTab(tabUsers, self.bs, self.us, self.cil)
 
         root.mainloop()

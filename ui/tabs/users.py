@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService
+from backend.api import BookService, UserService
 from constants import *
 from ui.image_loader import CachedImageLoader
 from ui.tabs.base import BaseTab
@@ -10,8 +10,10 @@ from ui.user_activity import UserActivity
 
 class UsersTab(BaseTab):
 
-    def __init__(self, tab: ttk.Frame, bs: BookService, cil: CachedImageLoader):
+    def __init__(self, tab: ttk.Frame, bs: BookService, us: UserService,
+                 cil: CachedImageLoader):
         super().__init__(tab, bs)
+        self.us = us
         self.cil = cil
         self.ua_list = []
 
@@ -19,7 +21,7 @@ class UsersTab(BaseTab):
         name = self.name.get()
         email = self.email.get()
         if all([name, email]):
-            self.bs.createUser(name, email)
+            self.us.createUser(name, email)
             self.refresh()
         else:
             self._showError('Missing properties')
@@ -36,7 +38,7 @@ class UsersTab(BaseTab):
 
     def _openUserDetails(self, event):
         for user_id in self.userslist.selection():
-            ua = UserActivity(self.bs, self.cil, int(user_id))
+            ua = UserActivity(self.bs, self.us, self.cil, int(user_id))
             # We have to keep a handle on these, so tkinter doesn't GC the image
             # This produces a small leak, since we can't easily remove these
             # from the list, even after they've been closed
@@ -47,7 +49,7 @@ class UsersTab(BaseTab):
         self.userslist = ttk.Treeview(self.tab, columns=('id', 'email'))
         self.userslist.heading('id', text='User ID')
         self.userslist.heading('email', text='Email')
-        users = self.bs.listUsers()
+        users = self.us.listUsers()
         for u in users:
             self.userslist.insert('', 'end', u.user_id, text=u.name, values=(u.user_id, u.email))
         self.userslist.pack(side='top', fill='both', expand=True)

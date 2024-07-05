@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService
+from backend.api import BookService, UserService
 from backend.db import Action
 from constants import *
 from ui.book_details import HistoricBookDetails
@@ -11,10 +11,11 @@ from ui.scrollable import ScrollFrame
 
 class UserActivity:
 
-    def __init__(self, bs: BookService, cil: CachedImageLoader, user_id: int):
+    def __init__(self, bs: BookService, us: UserService,
+                 cil: CachedImageLoader, user_id: int):
         self.bs = bs
         self.cil = cil
-        self.user = bs.getUser(user_id)
+        self.user = us.getUser(user_id)
 
         self.root = Toplevel()
         self.root.geometry(POPUP_WINDOW_SIZE)

@@ -7,7 +7,7 @@ from tkinter.messagebox import askokcancel
 from tkinter.simpledialog import askstring
 import urllib.request
 
-from backend.api import BookService
+from backend.api import BookService, UserService
 from backend.models import Book
 from constants import *
 from ui.checkout_history import CheckoutHistory
@@ -64,13 +64,14 @@ class BasicBookDetails:
 class InteractiveBookDetails(BasicBookDetails):
 
     def __init__(self, frame: ttk.Frame, ind: int, book: Book,
-                 cil: CachedImageLoader, bs: BookService):
+                 cil: CachedImageLoader, bs: BookService, us: UserService):
         super().__init__(frame, ind, book, cil)
         self.bs = bs
+        self.us = us
 
     def _checkout(self):
         users = {('%s (%d)' % (u.name, u.user_id)):u
-                 for u in self.bs.listUsers()}
+                 for u in self.us.listUsers()}
         
         prompt = ('Who is checking out \'%s\'?' % self.book.title)
         user = askcombo('Checkout', prompt, list(users))
@@ -136,18 +137,3 @@ class HistoricBookDetails(BasicBookDetails):
             ret = ttk.Label(frame, text=ret_txt, wraplength=300)
             ret.grid(column=0, row=5, sticky=W)
             ret.configure(style=METADATA_STYLE)
-
-
-# TODO: Get this working
-if __name__ == '__main__':
-    bs = BookService()
-    cil = CachedImageLoader()
-    book = Book('9780063021426', 'Babel', 'R. F. Kuang', 'Fiction', '2022',
-                'http://books.google.com/books/content?id=rkO-zgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-                True, 'Brian', 'Sometime')
-
-    root = Tk()
-    frame = ttk.Frame(root)
-    bd = BookDetails(frame, 0, bs, book, cil)
-    bd.refresh()
-    root.mainloop()

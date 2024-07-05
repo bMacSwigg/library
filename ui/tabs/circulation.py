@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, NotFoundException
+from backend.api import BookService, UserService, NotFoundException
 from constants import *
 from ui.book_list import BookList
 from ui.image_loader import CachedImageLoader
@@ -11,8 +11,10 @@ from ui.tabs.base import BaseTab
 class CirculationTab(BaseTab):
     """Tab for scanning in/out books and seeing what is currently lent out"""
 
-    def __init__(self, tab: ttk.Frame, bs: BookService, cil: CachedImageLoader):
+    def __init__(self, tab: ttk.Frame, bs: BookService, us: UserService,
+                 cil: CachedImageLoader):
         super().__init__(tab, bs)
+        self.us = us
         self.cil = cil
 
     def _lookupBook(self):
@@ -25,14 +27,15 @@ class CirculationTab(BaseTab):
         self.refresh()
         try:
             book = self.bs.getBook(isbn)
-            BookList(self.bookframe, [book], self.bs, self.cil).display(False)
+            bl = BookList(self.bookframe, [book], self.bs, self.us, self.cil)
+            bl.display(False)
         except NotFoundException:
             self._showError('No book with ISBN %s' % isbn)
 
     def _checkedOutBooks(self):
         self.refresh()
         books = self.bs.listBooksByStatus(True)
-        BookList(self.bookframe, books, self.bs, self.cil).display(False)
+        BookList(self.bookframe, books, self.bs, self.us, self.cil).display(False)
 
     def _clearError(self):
         if hasattr(self, 'error') and self.error.winfo_exists():

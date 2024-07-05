@@ -92,7 +92,8 @@ class BookService:
         self.db.putLog(isbn, Action.RETURN, user_id)
 
         book = self.getBook(isbn)
-        user = self.getUser(user_id)
+        user_vals = self.db.getUser(user_id)
+        user = User(user_vals[0], user_vals[1], user_vals[2])
         ret_time = self.db.getLatestLog(isbn)[1]
         self.email.send_return_message(book, user, ret_time)
 
@@ -106,6 +107,12 @@ class BookService:
         logs = self.db.listLogsByUser(user_id)
         logs = filter(lambda l: l[2] in [Action.CHECKOUT.value, Action.RETURN.value], logs)
         return list(logs)
+
+
+class UserService:
+
+    def __init__(self):
+        self.db = Database(DB_FILE)
 
     def getUser(self, user_id: int) -> User:
         user_vals = self.db.getUser(user_id)
