@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from backend.api import BookService, UserService
-from backend.db import Action
+from backend.models import Action, LogEntry
 from constants import *
 from ui.book_details import HistoricBookDetails
 from ui.image_loader import CachedImageLoader
@@ -46,41 +46,44 @@ class UserActivity:
             r.refresh()
 
     def _partition_user_logs(self, user_id: int) -> tuple[list, list]:
+        # Returns two lists:
+        # - The first is books currently checked out, formatted as (LogEntry, None)
+        # - The second is books previously checked out & returned, as (LogEntry, LogEntry)
         logs = self.bs.listUserCheckoutHistory(user_id)
         # list of logs will be ordered by timestamp
         # if a book was checked out, it cannot be checked out again until returned
         # and the return will be associated with the same user
         # so we can take each checkout & find the next matching return (if any)
-        checkouts = filter(lambda l: l[2] == Action.CHECKOUT.value, logs)
-        returns = list(filter(lambda l: l[2] == Action.RETURN.value, logs))
+        checkouts = filter(lambda l: l.action == Action.CHECKOUT, logs)
+        returns = list(filter(lambda l: l.action == Action.RETURN, logs))
         pairs = list(map(lambda c: (c, self._find_return(c, returns)), checkouts))
 
-        by_checkout_time = lambda p: p[0][1]
+        by_checkout_time = lambda p: p[0].timestamp
         pairs.sort(reverse=True, key=by_checkout_time)
 
         out = list(filter(lambda p: p[1] is None, pairs))
         back = list(filter(lambda p: p[1] is not None, pairs))
         return out, back
 
-    def _find_return(self, checkout, returns):
-        matching = filter(lambda r: r[0] == checkout[0], returns)
-        return next(filter(lambda r: r[1] > checkout[1], matching), None)
+    def _find_return(self, checkout: LogEntry, returns: list[LogEntry]) -> LogEntry:
+        matching = filter(lambda r: r.isbn == checkout.isbn, returns)
+        return next(filter(lambda r: r.timestamp > checkout.timestamp, matching), None)
 
-    def _display_outs(self, frame, out):
+    def _display_outs(self, frame: ttk.Frame, out: list[tuple[LogEntry, None]]):
         rows = []
         for idx, o in enumerate(out):
-            book = self.bs.getBook(o[0][0])
-            out_time = o[0][1]
+            book = self.bs.getBook(o[0].isbn)
+            out_time = o[0].timestamp
             hbd = HistoricBookDetails(frame, idx, book, self.cil, out_time)
             rows.append(hbd)
         return rows
 
-    def _display_backs(self, frame, back):
+    def _display_backs(self, frame: ttk.Frame, back: list[tuple[LogEntry, LogEntry]]):
         rows = []
         for idx, b in enumerate(back):
-            book = self.bs.getBook(b[0][0])
-            out_time = b[0][1]
-            ret_time = b[1][1]
+            book = self.bs.getBook(b[0].isbn)
+            out_time = b[0].timestamp
+            ret_time = b[1].timestamp
             hbd = HistoricBookDetails(frame, idx, book, self.cil, out_time, ret_time)
             rows.append(hbd)
         return rows

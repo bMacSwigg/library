@@ -2,8 +2,8 @@ import unittest
 import time
 
 from backend.api import BookService, UserService, InvalidStateException, NotFoundException
-from backend.db import Action, Database
-from backend.models import Book, User
+from backend.db import Database
+from backend.models import Book, User, Action
 from backend.testbase import BaseTestCase
 from constants import *
 from notifs.mailgun_client import FakeEmail
@@ -234,12 +234,16 @@ class TestBookService(BaseTestCase):
         res = self.books.listBookCheckoutHistory('isbn1')
 
         self.assertEqual(len(res), 2)
-        self.assertEqual(res[0][0], Action.CHECKOUT.value)
-        self.assertEqual(res[0][1], 'user')
-        self.assertAboutNow(res[0][2])
-        self.assertEqual(res[1][0], Action.RETURN.value)
-        self.assertEqual(res[1][1], 'user')
-        self.assertAboutNow(res[1][2])
+        self.assertEqual(res[0].isbn, 'isbn1')
+        self.assertAboutNow(res[0].timestamp)
+        self.assertEqual(res[0].action, Action.CHECKOUT)
+        self.assertEqual(res[0].user_id, 1234)
+        self.assertEqual(res[0].user_name, 'user')
+        self.assertEqual(res[1].isbn, 'isbn1')
+        self.assertAboutNow(res[1].timestamp)
+        self.assertEqual(res[1].action, Action.RETURN)
+        self.assertEqual(res[1].user_id, 1234)
+        self.assertEqual(res[1].user_name, 'user')
 
     def test_listUserCheckoutHistory(self):
         self.books.createBook(Book('isbn1', '', '', '', '', ''))
@@ -255,14 +259,16 @@ class TestBookService(BaseTestCase):
         res = self.books.listUserCheckoutHistory(user.user_id)
 
         self.assertEqual(len(res), 2)
-        self.assertEqual(res[0][0], 'isbn1')
-        self.assertAboutNow(res[0][1])
-        self.assertEqual(res[0][2], Action.CHECKOUT.value)
-        self.assertEqual(res[0][3], user.user_id)
-        self.assertEqual(res[1][0], 'isbn1')
-        self.assertAboutNow(res[1][1])
-        self.assertEqual(res[1][2], Action.RETURN.value)
-        self.assertEqual(res[1][3], user.user_id)
+        self.assertEqual(res[0].isbn, 'isbn1')
+        self.assertAboutNow(res[0].timestamp)
+        self.assertEqual(res[0].action, Action.CHECKOUT)
+        self.assertEqual(res[0].user_id, user.user_id)
+        self.assertEqual(res[0].user_name, 'user')
+        self.assertEqual(res[1].isbn, 'isbn1')
+        self.assertAboutNow(res[1].timestamp)
+        self.assertEqual(res[1].action, Action.RETURN)
+        self.assertEqual(res[1].user_id, user.user_id)
+        self.assertEqual(res[1].user_name, 'user')
 
 class TestUserService(BaseTestCase):
 

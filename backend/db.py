@@ -1,12 +1,8 @@
-from enum import Enum
 import logging
 import sqlite3
 
-class Action(Enum):
-    UNKNOWN = 0
-    CREATE = 1
-    CHECKOUT = 2
-    RETURN = 3
+from backend.models import Action
+
 
 class Database:
 
