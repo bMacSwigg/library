@@ -54,6 +54,9 @@ class UserActivity:
         returns = list(filter(lambda l: l[2] == Action.RETURN.value, logs))
         pairs = list(map(lambda c: (c, self._find_return(c, returns)), checkouts))
 
+        by_checkout_time = lambda p: p[0][1]
+        pairs.sort(reverse=True, key=by_checkout_time)
+
         out = list(filter(lambda p: p[1] is None, pairs))
         back = list(filter(lambda p: p[1] is not None, pairs))
         return out, back
