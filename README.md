@@ -3,7 +3,7 @@ Personal library catalog
 
 ## Setup
 
-Add this project directory to the PYTHONPATH, to ensure imports work.
+Add this project's parent directory to the PYTHONPATH, to ensure imports work.
 
 Install dependencies:
 *  Pillow, which is needed for displaying images
