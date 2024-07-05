@@ -1,9 +1,7 @@
-import random
 from tkinter import *
 from tkinter import ttk
 
 from backend.api import BookService
-from backend.models import User
 from constants import *
 from ui.image_loader import CachedImageLoader
 from ui.tabs.base import BaseTab
@@ -21,9 +19,7 @@ class UsersTab(BaseTab):
         name = self.name.get()
         email = self.email.get()
         if all([name, email]):
-            user_id = random.randint(MIN_USER_ID, MAX_USER_ID)
-            user = User(user_id, name, email)
-            self.bs.createUser(user)
+            self.bs.createUser(name, email)
             self.refresh()
         else:
             self._showError('Missing properties')

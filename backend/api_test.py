@@ -5,6 +5,7 @@ from backend.api import BookService, InvalidStateException, NotFoundException
 from backend.db import Action, Database
 from backend.models import Book, User
 from backend.testbase import BaseTestCase
+from constants import *
 from notifs.mailgun_client import FakeEmail
 
 class TestBookService(BaseTestCase):
@@ -240,27 +241,25 @@ class TestBookService(BaseTestCase):
     def test_listUserCheckoutHistory(self):
         self.books.createBook(Book('isbn1', '', '', '', '', ''))
         self.books.createBook(Book('isbn2', '', '', '', '', ''))
-        user = User(1234, 'user', 'user@example.com')
-        other = User(5678, 'other', 'other@example.com')
-        self.books.createUser(user)
-        self.books.createUser(other)
+        user = self.books.createUser('user', 'user@example.com')
+        other = self.books.createUser('other', 'other@example.com')
         time.sleep(1)
         self.books.checkoutBook('isbn1', user)
         time.sleep(1)
         self.books.returnBook('isbn1')
         self.books.checkoutBook('isbn2', other)
 
-        res = self.books.listUserCheckoutHistory(1234)
+        res = self.books.listUserCheckoutHistory(user.user_id)
 
         self.assertEqual(len(res), 2)
         self.assertEqual(res[0][0], 'isbn1')
         self.assertAboutNow(res[0][1])
         self.assertEqual(res[0][2], Action.CHECKOUT.value)
-        self.assertEqual(res[0][3], 1234)
+        self.assertEqual(res[0][3], user.user_id)
         self.assertEqual(res[1][0], 'isbn1')
         self.assertAboutNow(res[1][1])
         self.assertEqual(res[1][2], Action.RETURN.value)
-        self.assertEqual(res[1][3], 1234)
+        self.assertEqual(res[1][3], user.user_id)
 
     def test_getUser(self):
         self.books.db.putUser(1234, 'Brian', 'me@example.com')
@@ -272,12 +271,14 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res.email, 'me@example.com')
 
     def test_createUser(self):
-        user = User(1234, 'Brian', 'me@example.com')
-
-        self.books.createUser(user)
-        res = self.books.getUser(1234)
+        user = self.books.createUser('Brian', 'me@example.com')
+        res = self.books.getUser(user.user_id)
 
         self.assertEqual(res, user)
+        self.assertEqual(user.name, 'Brian')
+        self.assertEqual(user.email, 'me@example.com')
+        self.assertGreaterEqual(user.user_id, MIN_USER_ID)
+        self.assertLessEqual(user.user_id, MAX_USER_ID)
 
     def test_listUsers(self):
         self.books.db.putUser(1234, 'Brian', 'me@example.com')

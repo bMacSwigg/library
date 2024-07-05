@@ -1,4 +1,5 @@
 import json
+import random
 from urllib.request import urlopen
 
 from backend.models import Book, User
@@ -110,8 +111,11 @@ class BookService:
         user_vals = self.db.getUser(user_id)
         return User(user_vals[0], user_vals[1], user_vals[2])
 
-    def createUser(self, user: User):
+    def createUser(self, name: str, email: str) -> User:
+        user_id = random.randint(MIN_USER_ID, MAX_USER_ID)
+        user = User(user_id, name, email)
         self.db.putUser(user.user_id, user.name, user.email)
+        return user
 
     def listUsers(self) -> list[User]:
         vals = self.db.listUsers()
