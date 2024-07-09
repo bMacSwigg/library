@@ -15,7 +15,7 @@ class TestBookService(BaseTestCase):
 
     def setUp(self):
         self.db = Database(TEST_DATABASE)
-        schema_path = os.path.join(os.path.split(__file__)[0], 'books.schema')
+        schema_path = os.path.join(ROOT_PATH, 'backend', 'books.schema')
         with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)
@@ -276,7 +276,7 @@ class TestUserService(BaseTestCase):
 
     def setUp(self):
         self.db = Database(TEST_DATABASE)
-        schema_path = os.path.join(os.path.split(__file__)[0], 'books.schema')
+        schema_path = os.path.join(ROOT_PATH, 'backend', 'books.schema')
         with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)

@@ -4,8 +4,8 @@ import re
 import requests
 
 from library.backend.models import Book, User
+from library.constants import MAILGUN_APIKEY_FILE
 
-_MAILGUN_APIKEY_FILE = 'C:\\Users\\User\\Documents\\GitHub\\library\\notifs\\mailgun.secret'
 _EMAIL_FROM = 'Brian\'s Library <library@mcswiggen.me>'
 _CHECKOUT_TEMPLATE = 'Checkout Notification'
 _RETURN_TEMPLATE = 'Return Notification'
@@ -15,7 +15,7 @@ _VALID_EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 class Email:
 
-    def __init__(self, keyfile=_MAILGUN_APIKEY_FILE):
+    def __init__(self, keyfile=MAILGUN_APIKEY_FILE):
         self.logger = logging.getLogger('email_logger')
         logging.basicConfig(level=logging.WARNING)
         try:
