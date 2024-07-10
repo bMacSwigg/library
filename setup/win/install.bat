@@ -16,7 +16,12 @@ REM --distpath ~/library: put the bundled app in ~/library
 REM -F: bundle as a single file, rather than a directory
 REM -n library: name it library.exe (and not main.exe)
 REM -w: run in windowed mode (no accompanying command prompt)
-pyinstaller --distpath run --workpath run\tmp -F -n library -w main.py
+REM -i book-solid.ico: set the icon image
+pyinstaller ^
+  --distpath run --workpath run\tmp ^
+  --add-data book-solid.ico:. ^
+  -F -n library -w ^
+  main.py
 
 ECHO Deleting temp files
 RMDIR run\tmp /s
