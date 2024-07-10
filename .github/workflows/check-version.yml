@@ -21,4 +21,4 @@ jobs:
           fetch-depth: 2
       - name: Get changes
         run: |
-          git diff --name-only HEAD^1 HEAD version.py | grep -q "version.py"
+          git diff --name-only HEAD^1 HEAD src/library/version.py | grep -q "version.py"

@@ -1,11 +1,11 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, UserService
-from constants import *
-from ui.image_loader import CachedImageLoader
-from ui.tabs.base import BaseTab
-from ui.user_activity import UserActivity
+from library.backend.api import BookService, UserService
+from library.constants import *
+from library.ui.image_loader import CachedImageLoader
+from library.ui.tabs.base import BaseTab
+from library.ui.user_activity import UserActivity
 
 
 class UsersTab(BaseTab):

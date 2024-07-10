@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, LookupService
-from backend.models import Book
-from constants import *
-from ui.tabs.base import BaseTab
+from library.backend.api import BookService, LookupService
+from library.backend.models import Book
+from library.constants import *
+from library.ui.tabs.base import BaseTab
 
 
 class ImportTab(BaseTab):

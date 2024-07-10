@@ -1,6 +1,6 @@
 from tkinter import ttk
 
-from backend.api import BookService
+from library.backend.api import BookService
 
 
 class BaseTab:
