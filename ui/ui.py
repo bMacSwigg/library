@@ -9,6 +9,7 @@ from library.ui.tabs.catalog import CatalogTab
 from library.ui.tabs.circulation import CirculationTab
 from library.ui.tabs.import_tab import ImportTab
 from library.ui.tabs.users import UsersTab
+from library.version import __version__
 
 
 class AppWindow:
@@ -32,8 +33,9 @@ class AppWindow:
 
     def main(self):
         root = Tk()
-        root.title('Brian\'s Library')
+        root.title('Brian\'s Library (v%s)' % __version__)
         root.geometry('600x400')
+        root.iconbitmap(ICON_FILE)
 
         ttk.Style().configure(ERROR_STYLE, foreground='red')
         ttk.Style().configure(TITLE_STYLE, font=('Arial', 14, 'bold'))
