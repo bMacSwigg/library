@@ -7,8 +7,7 @@ class CachedImageLoader:
 
     def __init__(self):
         self.urlmap = {}
-        self.logger = logging.getLogger('imageloader_logger')
-        logging.basicConfig(level=logging.WARNING)
+        self.logger = logging.getLogger(__name__)
 
     def getImage(self, url):
         if url in self.urlmap:

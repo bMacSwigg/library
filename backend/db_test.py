@@ -10,6 +10,7 @@ from library.backend.testbase import BaseTestCase
 class TestDatabase(BaseTestCase):
 
     TEST_DATABASE = ':memory:'
+    LOGGER_NAME = 'library.backend.db'
 
     def setUp(self):
         self.db = Database(self.TEST_DATABASE)
@@ -22,19 +23,19 @@ class TestDatabase(BaseTestCase):
         self.db.close()
 
     def test_check_tablesExist(self):
-        with self.assertNoLogs('db_logger', level='WARNING') as lc:
+        with self.assertNoLogs(self.LOGGER_NAME, level='WARNING') as lc:
             self.db.check()
 
     def test_check_tablesMissing(self):
         self.db.con.cursor().execute('DROP TABLE Books')
         self.db.con.cursor().execute('DROP TABLE ActionLogs')
         self.db.con.cursor().execute('DROP TABLE Users')
-        with self.assertLogs('db_logger', level='WARNING') as lc:
+        with self.assertLogs(self.LOGGER_NAME, level='WARNING') as lc:
             self.db.check()
             self.assertEqual(lc.output,
-                             ['WARNING:db_logger:Table Books does not exist',
-                              'WARNING:db_logger:Table ActionLogs does not exist',
-                              'WARNING:db_logger:Table Users does not exist'])
+                             ['WARNING:library.backend.db:Table Books does not exist',
+                              'WARNING:library.backend.db:Table ActionLogs does not exist',
+                              'WARNING:library.backend.db:Table Users does not exist'])
 
     def test_book_putAndGet(self):
         self.db.putBook('some-isbn', 'Really Cool Book', 'Smart Person', 'Non-fiction', '1998', 'url')
