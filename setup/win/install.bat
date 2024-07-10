@@ -6,7 +6,7 @@ REM TODO: verify python & pip
 
 ECHO Installing dependencies
 REM Install project dependencies
-pip install -r requirements.txt
+pip install -r src\library\requirements.txt
 REM Install pyinstaller to build executables
 pip install pyinstaller
 
@@ -19,9 +19,9 @@ REM -w: run in windowed mode (no accompanying command prompt)
 REM -i book-solid.ico: set the icon image
 pyinstaller ^
   --distpath run --workpath run\tmp ^
-  --add-data book-solid.ico:. ^
+  --add-data src\library\book-solid.ico:. ^
   -F -n library -w ^
-  main.py
+  src\library\main.py
 
 ECHO Deleting temp files
 RMDIR run\tmp /s
@@ -33,4 +33,4 @@ SET /P MAKEDB=Do you want to initialize a blank database (Y/[N])?
 IF /I "%MAKEDB%" NEQ "Y" EXIT /B
 
 ECHO Creating and initializing database
-python setup\makedb.py backend\books.schema run\books.db
+python setup\makedb.py src\library\backend\books.schema run\books.db

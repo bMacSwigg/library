@@ -1,12 +1,12 @@
 from tkinter import *
 from tkinter import ttk
 
-from backend.api import BookService, UserService, NotFoundException
-from constants import *
-from ui.book_list import BookList
-from ui.image_loader import CachedImageLoader
-from ui.scrollable import ScrollFrame
-from ui.tabs.base import BaseTab
+from library.backend.api import BookService, UserService, NotFoundException
+from library.constants import *
+from library.ui.book_list import BookList
+from library.ui.image_loader import CachedImageLoader
+from library.ui.scrollable import ScrollFrame
+from library.ui.tabs.base import BaseTab
 
 class CirculationTab(BaseTab):
     """Tab for scanning in/out books and seeing what is currently lent out"""

@@ -1,12 +1,12 @@
 from tkinter import ttk
 
-from backend.api import BookService, UserService
-from backend.models import Book
-from ui.book_list import BookList
-from ui.hinted_entry import HintedEntry, HintedStringVar
-from ui.image_loader import CachedImageLoader
-from ui.scrollable import ScrollFrame
-from ui.tabs.base import BaseTab
+from library.backend.api import BookService, UserService
+from library.backend.models import Book
+from library.ui.book_list import BookList
+from library.ui.hinted_entry import HintedEntry, HintedStringVar
+from library.ui.image_loader import CachedImageLoader
+from library.ui.scrollable import ScrollFrame
+from library.ui.tabs.base import BaseTab
 
 class CatalogTab(BaseTab):
     """Main tab, for showing the full catalog & searching for books"""
