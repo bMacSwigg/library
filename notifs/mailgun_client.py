@@ -16,8 +16,7 @@ _VALID_EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 class Email:
 
     def __init__(self, keyfile=MAILGUN_APIKEY_FILE):
-        self.logger = logging.getLogger('email_logger')
-        logging.basicConfig(level=logging.WARNING)
+        self.logger = logging.getLogger(__name__)
         try:
             with open(keyfile, 'r') as file:
                 self.api_key = file.read()

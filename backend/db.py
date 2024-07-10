@@ -13,8 +13,7 @@ class Database:
     def __init__(self, filename):
         self.filename = filename
         self.con = sqlite3.connect(filename)
-        self.logger = logging.getLogger('db_logger')
-        logging.basicConfig(level=logging.WARNING)
+        self.logger = logging.getLogger(__name__)
 
     def __del__(self):
         self.close()
