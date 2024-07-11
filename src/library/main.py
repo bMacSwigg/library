@@ -12,7 +12,6 @@ try:
     aw = AppWindow()
     logger.info('Initialized AppWindow')
     aw.main()
-except:
-    # execution context will be logged automatically
-    logger.error('Execution hit an error')
+except Exception as e:
+    logger.error('Execution hit an error', exc_info=e)
 logger.info('End')
