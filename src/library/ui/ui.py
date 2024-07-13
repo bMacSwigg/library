@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 
 from library.backend.api import BookService, LookupService, UserService
-from library.config import AppConfig
+from library.config import APP_CONFIG
 from library.constants import *
 from library.ui.image_loader import CachedImageLoader
 from library.ui.tabs.catalog import CatalogTab
@@ -34,9 +34,9 @@ class AppWindow:
 
     def main(self):
         root = Tk()
-        root.title('%s\'s Library (v%s)' % (AppConfig.owner(), __version__))
+        root.title('%s\'s Library (v%s)' % (APP_CONFIG.owner(), __version__))
         root.geometry('600x400')
-        root.iconbitmap(ICON_FILE)
+        root.iconbitmap(APP_CONFIG.icon_file())
 
         ttk.Style().configure(ERROR_STYLE, foreground='red')
         ttk.Style().configure(TITLE_STYLE, font=('Arial', 14, 'bold'))
