@@ -4,7 +4,7 @@ import re
 import requests
 
 from library.backend.models import Book, User
-from library.constants import MAILGUN_APIKEY_FILE
+from library.config import APP_CONFIG
 
 _EMAIL_FROM = 'Brian\'s Library <library@mcswiggen.me>'
 _CHECKOUT_TEMPLATE = 'Checkout Notification'
@@ -15,8 +15,13 @@ _VALID_EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 class Email:
 
-    def __init__(self, keyfile=MAILGUN_APIKEY_FILE):
+    def __init__(self, keyfile=APP_CONFIG.mailgun_apikey_file()):
         self.logger = logging.getLogger(__name__)
+        if keyfile is None:
+            self.logger.warning('No API key provided, emails will not be sent')
+            self.api_key = ''
+            return
+
         try:
             with open(keyfile, 'r') as file:
                 self.api_key = file.read()

@@ -6,7 +6,7 @@ from library.backend.api import BookService, UserService, InvalidStateException,
 from library.backend.db import Database
 from library.backend.models import Book, User, Action
 from library.backend.testbase import BaseTestCase
-from library.constants import *
+from library.constants import MIN_USER_ID, MAX_USER_ID
 from library.notifs.mailgun_client import FakeEmail
 
 TEST_DATABASE = ':memory:'
@@ -15,7 +15,7 @@ class TestBookService(BaseTestCase):
 
     def setUp(self):
         self.db = Database(TEST_DATABASE)
-        schema_path = os.path.join(ROOT_PATH, 'backend', 'books.schema')
+        schema_path = os.path.join(os.path.dirname(__file__), 'books.schema')
         with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)
@@ -276,7 +276,7 @@ class TestUserService(BaseTestCase):
 
     def setUp(self):
         self.db = Database(TEST_DATABASE)
-        schema_path = os.path.join(ROOT_PATH, 'backend', 'books.schema')
+        schema_path = os.path.join(os.path.dirname(__file__), 'books.schema')
         with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)

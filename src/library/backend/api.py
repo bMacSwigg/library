@@ -4,7 +4,8 @@ from urllib.request import urlopen
 
 from library.backend.models import Book, User, Action, LogEntry
 from library.backend.db import Database
-from library.constants import *
+from library.config import APP_CONFIG
+from library.constants import MIN_USER_ID, MAX_USER_ID
 from library.notifs.mailgun_client import Email
 
 
@@ -25,7 +26,7 @@ class InvalidStateException(Exception):
 class BookService:
 
     def __init__(self):
-        self.db = Database(DB_FILE)
+        self.db = Database(APP_CONFIG.db_file())
         self.email = Email()
 
     def _parseLogs(self, log_vals: tuple) -> LogEntry:
@@ -114,7 +115,7 @@ class BookService:
 class UserService:
 
     def __init__(self):
-        self.db = Database(DB_FILE)
+        self.db = Database(APP_CONFIG.db_file())
 
     def getUser(self, user_id: int) -> User:
         user_vals = self.db.getUser(user_id)
