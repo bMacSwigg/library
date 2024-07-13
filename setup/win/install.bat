@@ -13,13 +13,14 @@ pip install pyinstaller
 ECHO Bundling executable
 REM Bundle the script, starting from main.py as the base file
 REM --distpath ~/library: put the bundled app in ~/library
+REM --add-data [...]: data files to bundle inside the app
 REM -F: bundle as a single file, rather than a directory
 REM -n library: name it library.exe (and not main.exe)
 REM -w: run in windowed mode (no accompanying command prompt)
-REM -i book-solid.ico: set the icon image
 pyinstaller ^
   --distpath run --workpath run\tmp ^
   --add-data src\library\book-solid.ico:. ^
+  --add-data src\library\config.ini:. ^
   -F -n library -w ^
   src\library\main.py
 
