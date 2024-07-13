@@ -9,7 +9,7 @@ class TestConfig(unittest.TestCase):
 
     def setUp(self):
         # so it can find the config for prod versions
-        sys._MEIPASS = os.getcwd()
+        sys._MEIPASS = os.path.normpath(os.path.dirname(__file__))
 
     def test_owner_dev(self):
         ac = AppConfig()
