@@ -21,7 +21,7 @@ class TestConfig(unittest.TestCase):
 
     def test_dbfile_dev(self):
         ac = AppConfig()
-        expected_subpath = 'library\\src\\library\\backend\\books.db'
+        expected_subpath = os.path.normpath('library/src/library/backend/books.db')
         self.assertIn(expected_subpath, ac.db_file())
 
     def test_dbfile_prod(self):
@@ -32,7 +32,7 @@ class TestConfig(unittest.TestCase):
 
     def test_mailgunkey_dev(self):
         ac = AppConfig()
-        expected_subpath = 'library\\src\\library\\notifs\\mailgun.secret'
+        expected_subpath = os.path.normpath('library/src/library/notifs/mailgun.secret')
         self.assertIn(expected_subpath, ac.mailgun_apikey_file())
 
     def test_mailgunkey_prod(self):
@@ -41,17 +41,17 @@ class TestConfig(unittest.TestCase):
 
     def test_iconfile_dev(self):
         ac = AppConfig()
-        expected_subpath = 'library\\src\\library\\book-solid.ico'
+        expected_subpath = os.path.normpath('library/src/library/book-solid.ico')
         self.assertIn(expected_subpath, ac.icon_file())
 
     def test_iconfile_prod(self):
         ac = AppConfig(override_prod=True)
-        expected_subpath = 'library\\src\\library\\book-solid.ico'
+        expected_subpath = os.path.normpath('library/src/library/book-solid.ico')
         self.assertIn(expected_subpath, ac.icon_file())
 
     def test_logfile_dev(self):
         ac = AppConfig()
-        expected_subpath = 'library\\src\\library\\library.log'
+        expected_subpath = os.path.normpath('library/src/library/library.log')
         self.assertIn(expected_subpath, ac.log_file())
 
     def test_logfile_prod(self):
