@@ -10,14 +10,12 @@ from library.backend.models import Book
 
 # Initialize Flask app
 app = Flask(__name__)
-logger = logging.getLogger(__name__)
 
 @app.route('/books/<book_id>', methods=['GET'])
 def getBook(book_id):
     """
         getBook() : Retrieve book by ID (currently, ISBN)
     """
-    print('getBook')
     try:
         book = BookService().getBook(book_id)
     except NotFoundException:
@@ -28,9 +26,11 @@ def getBook(book_id):
 @app.route('/books', methods=['GET'])
 def listBooks():
     """
-        listBooks() : Retrieve rsvp data by event & RSVP IDs
+        listBooks() : List all books. At most one of 'query' and 'is_out' may
+        be specified. If 'query' is specified, returns only books whose title
+        or author contains 'query' as a substring. If 'is_out' is specified,
+        filters to only books that are (or are not) currently checked out.
     """
-    print('listBooks')
     if 'query' in request.args and 'is_out' in request.args:
         return "'query' and 'is_out' filters cannot both be specified", 400
 
@@ -50,7 +50,6 @@ def createBook():
     """
         createBook() : Create a new Book.
     """
-    print('createBook')
     try: 
         json = request.json['book']
         book = Book(json['isbn'], json['title'], json['author'],
@@ -64,7 +63,8 @@ def createBook():
 @app.route('/books/<book_id>/checkout', methods=['POST'])
 def checkoutBook(book_id):
     """
-        checkoutBook() :
+        checkoutBook() : Mark this book as checked out by a given user. Book
+        must not be currently checked out.
     """
     if 'user_id' not in request.json:
         return "Missing 'user_id' property", 400
@@ -83,7 +83,8 @@ def checkoutBook(book_id):
 @app.route('/books/<book_id>/return', methods=['POST'])
 def returnBook(book_id):
     """
-        checkoutBook() :
+        returnBook() : Mark this book as returned, by whoever checked it out.
+        Book must be currently checked out.
     """
     try:
         BookService().returnBook(book_id)
@@ -95,8 +96,8 @@ def returnBook(book_id):
 @app.route('/books/<book_id>/history', methods=['GET'])
 def listBookCheckoutHistory(book_id):
     """
-        uploadFeedback() : Upload freeform feedback from the site
-        Includes the URL that feedback was uploaded from and other metadata
+        listBookCheckoutHistory() : List the CHECKOUT and RETURN log events
+        for this book. Ordered from earliest to latest.
     """
     logs = BookService().listBookCheckoutHistory(book_id)
     return jsonify(list(map(asdict, logs))), 200
