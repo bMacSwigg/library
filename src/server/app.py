@@ -11,6 +11,7 @@ from library.backend.models import Book
 # Initialize Flask app
 app = Flask(__name__)
 
+# Books API
 @app.route('/books/<book_id>', methods=['GET'])
 def getBook(book_id):
     """
@@ -101,6 +102,39 @@ def listBookCheckoutHistory(book_id):
     """
     logs = BookService().listBookCheckoutHistory(book_id)
     return jsonify(list(map(asdict, logs))), 200
+
+# Users API
+@app.route('/users/<int:user_id>', methods=['GET'])
+def getUser(user_id):
+    """
+        getUser() : Retrieve user by ID
+    """
+    user = UserService().getUser(user_id)
+    return jsonify(user), 200
+
+@app.route('/users', methods=['GET'])
+def listUsers():
+    """
+        listUsers() : List all users.
+    """
+    users = UserService().listUsers()
+
+    return jsonify(list(map(asdict, users))), 200
+
+@app.route('/users', methods=['POST'])
+def createUser():
+    """
+        createUser() : Create a new User.
+    """
+    try: 
+        json = request.json['user']
+        name = json['name']
+        email = json['email']
+    except KeyError:
+        return "Missing property", 400
+    else:
+        user = UserService().createUser(name, email)
+        return jsonify(user), 200
 
 
 port = int(os.environ.get('PORT', 8080))
