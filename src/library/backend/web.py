@@ -1,4 +1,6 @@
 import json
+from urllib.error import HTTPError
+from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from library.backend.api import BookService, UserService
@@ -13,10 +15,23 @@ class WebBookService(BookService):
         self.url = APP_CONFIG.remote_backend()
     
     def getBook(self, isbn: str) -> Book:
-        pass
+        url = "%s/books/%s" % (self.url, isbn)
+        try:
+            res = json.load(urlopen(url))
+        except HTTPError as e:
+            if e.code == 404:
+                raise NotFoundException('No book in database with ISBN %s' % isbn)
+            else:
+                raise e
+        return Book(**res)
 
     def listBooks(self, search: str|None = None) -> list[Book]:
-        pass
+        url = "%s/books" % self.url
+        if search:
+            params = urlencode({'query': search})
+            url = "%s?%s" % (url, params)
+        res = json.load(urlopen(url))
+        return list(map(lambda r: Book(**r), res))
 
     def listBooksByStatus(self, is_out) -> list[Book]:
         pass
