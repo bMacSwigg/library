@@ -2,7 +2,8 @@ import io
 from tkinter import *
 from tkinter import ttk
 
-from library.backend.api import BookService, LookupService, UserService
+from library.backend.api import BookService, UserService
+from library.backend.lookup import LookupService
 from library.config import APP_CONFIG
 from library.constants import *
 from library.ui.image_loader import CachedImageLoader
