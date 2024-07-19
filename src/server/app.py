@@ -4,8 +4,8 @@ from flask import Flask, request, jsonify
 import logging
 import os
 
-from library.backend.api import BookService, UserService
 from library.backend.api import InvalidStateException, NotFoundException
+from library.backend.local import LocalBookService, LocalUserService
 from library.backend.models import Book
 
 # Initialize Flask app
@@ -18,7 +18,7 @@ def getBook(book_id):
         getBook() : Retrieve book by ID (currently, ISBN)
     """
     try:
-        book = BookService().getBook(book_id)
+        book = LocalBookService().getBook(book_id)
     except NotFoundException:
         return "Book with ID '%s' not found" % book_id, 404
     else:
@@ -37,12 +37,12 @@ def listBooks():
 
     if 'is_out' in request.args:
         is_out = bool(int(request.args['is_out']))
-        books = BookService().listBooksByStatus(is_out)
+        books = LocalBookService().listBooksByStatus(is_out)
     elif 'query' in request.args:
         q = request.args['query']
-        books = BookService().listBooks(q)
+        books = LocalBookService().listBooks(q)
     else:
-        books = BookService().listBooks()
+        books = LocalBookService().listBooks()
 
     return jsonify(list(map(asdict, books))), 200
 
@@ -58,7 +58,7 @@ def createBook():
     except KeyError:
         return "Missing property", 400
     else:
-        BookService().createBook(book)
+        LocalBookService().createBook(book)
         return "Book created", 200
 
 @app.route('/books/<book_id>/checkout', methods=['POST'])
@@ -72,10 +72,10 @@ def checkoutBook(book_id):
 
     user_id = request.json['user_id']
     # TODO: deal with this not being a real user ID
-    user = UserService().getUser(user_id)
+    user = LocalUserService().getUser(user_id)
 
     try:
-        BookService().checkoutBook(book_id, user)
+        LocalBookService().checkoutBook(book_id, user)
     except InvalidStateException:
         return "Book with ISBN %s already out" % book_id, 400
     else:
@@ -88,7 +88,7 @@ def returnBook(book_id):
         Book must be currently checked out.
     """
     try:
-        BookService().returnBook(book_id)
+        LocalBookService().returnBook(book_id)
     except InvalidStateException:
         return "Book with ISBN %s not checked out" % book_id, 400
     else:
@@ -100,7 +100,7 @@ def listBookCheckoutHistory(book_id):
         listBookCheckoutHistory() : List the CHECKOUT and RETURN log events
         for this book. Ordered from earliest to latest.
     """
-    logs = BookService().listBookCheckoutHistory(book_id)
+    logs = LocalBookService().listBookCheckoutHistory(book_id)
     return jsonify(list(map(asdict, logs))), 200
 
 # Users API
@@ -109,7 +109,7 @@ def getUser(user_id):
     """
         getUser() : Retrieve user by ID
     """
-    user = UserService().getUser(user_id)
+    user = LocalUserService().getUser(user_id)
     return jsonify(user), 200
 
 @app.route('/users', methods=['GET'])
@@ -117,7 +117,7 @@ def listUsers():
     """
         listUsers() : List all users.
     """
-    users = UserService().listUsers()
+    users = LocalUserService().listUsers()
 
     return jsonify(list(map(asdict, users))), 200
 
@@ -133,7 +133,7 @@ def createUser():
     except KeyError:
         return "Missing property", 400
     else:
-        user = UserService().createUser(name, email)
+        user = LocalUserService().createUser(name, email)
         return jsonify(user), 200
 
 

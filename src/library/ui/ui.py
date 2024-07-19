@@ -2,7 +2,7 @@ import io
 from tkinter import *
 from tkinter import ttk
 
-from library.backend.api import BookService, UserService
+from library.backend.local import LocalBookService, LocalUserService
 from library.backend.lookup import LookupService
 from library.config import APP_CONFIG
 from library.constants import *
@@ -17,9 +17,9 @@ from library.version import __version__
 class AppWindow:
 
     def __init__(self):
-        self.bs = BookService()
+        self.bs = LocalBookService()
         self.ls = LookupService()
-        self.us = UserService()
+        self.us = LocalUserService()
         self.cil = CachedImageLoader()
 
     def refreshCurrentTab(self, event):
