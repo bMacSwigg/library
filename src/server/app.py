@@ -136,6 +136,15 @@ def createUser():
         user = LocalUserService().createUser(name, email)
         return jsonify(user), 200
 
+@app.route('/users/<int:user_id>/history', methods=['GET'])
+def listUserCheckoutHistory(user_id):
+    """
+        listUserCheckoutHistory() : List the CHECKOUT and RETURN log events
+        for this user. Ordered from earliest to latest.
+    """
+    logs = LocalBookService().listUserCheckoutHistory(user_id)
+    return jsonify(list(map(asdict, logs))), 200
+
 
 port = int(os.environ.get('PORT', 8080))
 if __name__ == '__main__':

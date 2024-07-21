@@ -36,6 +36,7 @@ class TestApp(unittest.TestCase):
         self.db.con.cursor().execute('DROP TABLE Users')
         self.db.con.cursor().execute('DROP TABLE ActionLogs')
 
+    # Books API
     def test_getBook_exists(self):
         self.db.putBook('1234', 'A Book', 'Somebody', 'cat', 'year', 'img')
 
@@ -68,6 +69,31 @@ class TestApp(unittest.TestCase):
         data = json.loads(res.data.decode('UTF-8'))
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['title'], 'Sequel')
+
+    # Users API
+    def test_listUserCheckoutHistory(self):
+        self.db.putBook('1234', 'A Book', 'Somebody', 'cat', 'year', 'img')
+        self.db.putBook('5678', 'Sequel', 'Somebody', 'cat', 'year', 'img')
+        self.db.putUser(9999, 'user', 'fake-email')
+        self.db.putUser(1111, 'other', 'other-email')
+
+        self.client.post("/books/1234/checkout", json={'user_id': 9999})
+        time.sleep(1)
+        self.client.post("/books/1234/return")
+        self.client.post("/books/5678/checkout", json={'user_id': 1111})
+
+        res = self.client.get("/users/9999/history")
+
+        data = json.loads(res.data.decode('UTF-8'))
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0]['isbn'], '1234')
+        self.assertEqual(data[0]['action'], 2)  # Action.CHECKOUT
+        self.assertEqual(data[0]['user_id'], 9999)
+        self.assertEqual(data[0]['user_name'], 'user')
+        self.assertEqual(data[1]['isbn'], '1234')
+        self.assertEqual(data[1]['action'], 3)  # Action.RETURN
+        self.assertEqual(data[1]['user_id'], 9999)
+        self.assertEqual(data[1]['user_name'], 'user')
 
 
 if __name__ == '__main__':
