@@ -1,7 +1,10 @@
+from dataclasses import asdict
 import json
+import requests
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
+# TODO: switch to requests library
 
 from library.backend.api import BookService, UserService
 from library.backend.api import NotFoundException, InvalidStateException
@@ -16,22 +19,16 @@ class WebBookService(BookService):
     
     def getBook(self, isbn: str) -> Book:
         url = "%s/books/%s" % (self.url, isbn)
-        try:
-            res = json.load(urlopen(url))
-        except HTTPError as e:
-            if e.code == 404:
-                raise NotFoundException('No book in database with ISBN %s' % isbn)
-            else:
-                raise e
-        return Book(**res)
+        resp = requests.get(url)
+        if resp.status_code == 404:
+            raise NotFoundException('No book in database with ISBN %s' % isbn)
+        return Book(**json.loads(resp.text))
 
     def listBooks(self, search: str|None = None) -> list[Book]:
         url = "%s/books" % self.url
-        if search:
-            params = urlencode({'query': search})
-            url = "%s?%s" % (url, params)
-        res = json.load(urlopen(url))
-        return list(map(lambda r: Book(**r), res))
+        params = {'query': search}
+        resp = requests.get(url, params=params)
+        return list(map(lambda r: Book(**r), json.loads(resp.text)))
 
     def listBooksByStatus(self, is_out) -> list[Book]:
         pass
