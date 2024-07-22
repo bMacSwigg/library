@@ -38,10 +38,17 @@ class WebBookService(BookService):
         requests.post(url, json=data)
 
     def checkoutBook(self, isbn: str, user: User):
-        pass
+        url = "%s/books/%s/checkout" % (self.url, isbn)
+        data = {'user_id': user.user_id}
+        resp = requests.post(url, json=data)
+        if resp.status_code == 400:
+            raise InvalidStateException('Book with ISBN %s already out' % isbn)
 
     def returnBook(self, isbn: str):
-        pass
+        url = "%s/books/%s/return" % (self.url, isbn)
+        resp = requests.post(url)
+        if resp.status_code == 400:
+            raise InvalidStateException('Book with ISBN %s is not out' % isbn)
 
     def listBookCheckoutHistory(self, isbn: str) -> list[LogEntry]:
         pass

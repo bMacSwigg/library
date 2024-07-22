@@ -7,9 +7,9 @@ from unittest import mock
 from urllib.parse import urlencode
 from werkzeug.test import TestResponse
 
-from library.backend.api import NotFoundException
+from library.backend.api import NotFoundException, InvalidStateException
 from library.backend.db import Database
-from library.backend.models import Book, Action
+from library.backend.models import Book, User, Action
 from library.backend.testbase import BaseTestCase
 from library.backend.web import WebBookService
 from library.config import APP_CONFIG
@@ -133,6 +133,57 @@ class TestBookService(BaseTestCase):
         res = self.bs.getBook('1234')
 
         self.assertEqual(res, book)
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_checkoutBook(self, *_):
+        self.db.putBook('isbn1', '', '', '', '', '')
+        user = User(1234, 'user', 'fake-email')
+        self.db.putUser(user.user_id, user.name, user.email)
+
+        self.bs.checkoutBook('isbn1', user)
+        res = self.bs.getBook('isbn1')
+
+        self.assertEqual(res.is_out, True)
+        self.assertEqual(res.checkout_user, 'user')
+        self.assertAboutNow(res.checkout_time)
+
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_checkoutBook_alreadyOut(self, _):
+        self.db.putBook('isbn1', '', '', '', '', '')
+        user = User(1234, 'user', 'fake-email')
+        self.db.putUser(user.user_id, user.name, user.email)
+        self.bs.checkoutBook('isbn1', user)
+
+        with self.assertRaises(InvalidStateException):
+            self.bs.checkoutBook('isbn1', user)
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_returnBook(self, *_):
+        self.db.putBook('isbn1', '', '', '', '', '')
+        user = User(1234, 'user', 'fake-email')
+        self.db.putUser(user.user_id, user.name, user.email)
+        self.bs.checkoutBook('isbn1', user)
+        time.sleep(1)
+
+        self.bs.returnBook('isbn1')
+        res = self.bs.getBook('isbn1')
+        log = self.db.getLatestLog('isbn1')
+
+        self.assertEqual(res.is_out, False)
+        self.assertEqual(res.checkout_user, '')
+        self.assertEqual(res.checkout_time, '')
+        self.assertAboutNow(log[1])
+        self.assertEqual(log[2], Action.RETURN.value)
+        self.assertEqual(log[3], 1234)
+
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_returnBook_notOut(self, _):
+        self.db.putBook('isbn1', '', '', '', '', '')
+
+        with self.assertRaises(InvalidStateException):
+            self.bs.returnBook('isbn1')
 
 
 if __name__ == '__main__':
