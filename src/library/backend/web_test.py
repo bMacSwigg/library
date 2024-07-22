@@ -11,8 +11,9 @@ from library.backend.api import NotFoundException, InvalidStateException
 from library.backend.db import Database
 from library.backend.models import Book, User, Action
 from library.backend.testbase import BaseTestCase
-from library.backend.web import WebBookService
+from library.backend.web import WebBookService, WebUserService
 from library.config import APP_CONFIG
+from library.constants import MIN_USER_ID, MAX_USER_ID
 from server.app import app
 
 # sqlite doesn't seem to do a good job of wiping in-memory DBs
@@ -45,7 +46,6 @@ class TestBookService(BaseTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.tcw = TestClientWrapper(app.test_client())
         APP_CONFIG.db_file = lambda: DB_FILE
         cls.db = Database(APP_CONFIG.db_file())
         schema_path = os.path.join(os.path.dirname(__file__), 'books.schema')
@@ -238,6 +238,66 @@ class TestBookService(BaseTestCase):
         self.assertEqual(res[1].action, Action.RETURN)
         self.assertEqual(res[1].user_id, user.user_id)
         self.assertEqual(res[1].user_name, 'user')
+
+class TestUserService(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        APP_CONFIG.db_file = lambda: DB_FILE
+        cls.db = Database(APP_CONFIG.db_file())
+        schema_path = os.path.join(os.path.dirname(__file__), 'books.schema')
+        with open(schema_path, 'r') as file:
+            cls.schema = file.read()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.db.close()
+
+    def setUp(self):
+        self.db.con.cursor().executescript(self.schema)
+        self.us = WebUserService()
+
+    def tearDown(self):
+        self.db.con.cursor().execute('DROP TABLE Books')
+        self.db.con.cursor().execute('DROP TABLE Users')
+        self.db.con.cursor().execute('DROP TABLE ActionLogs')
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    def test_getUser(self, _):
+        self.db.putUser(1234, 'Brian', 'my-email')
+
+        res = self.us.getUser(1234)
+
+        self.assertEqual(res.user_id, 1234)
+        self.assertEqual(res.name, 'Brian')
+        self.assertEqual(res.email, 'my-email')
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_createUser(self, *_):
+        user = self.us.createUser('Brian', 'my-email')
+        res = self.us.getUser(user.user_id)
+
+        self.assertEqual(res, user)
+        self.assertEqual(user.name, 'Brian')
+        self.assertEqual(user.email, 'my-email')
+        self.assertGreaterEqual(user.user_id, MIN_USER_ID)
+        self.assertLessEqual(user.user_id, MAX_USER_ID)
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    def test_listUsers(self, _):
+        self.db.putUser(1234, 'Brian', 'my-email')
+        self.db.putUser(5678, 'Other', 'other-email')
+
+        res = self.us.listUsers()
+
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0].user_id, 1234)
+        self.assertEqual(res[0].name, 'Brian')
+        self.assertEqual(res[0].email, 'my-email')
+        self.assertEqual(res[1].user_id, 5678)
+        self.assertEqual(res[1].name, 'Other')
+        self.assertEqual(res[1].email, 'other-email')
 
 
 if __name__ == '__main__':

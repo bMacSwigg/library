@@ -66,10 +66,17 @@ class WebUserService(UserService):
         self.url = APP_CONFIG.remote_backend()
 
     def getUser(self, user_id: int) -> User:
-        pass
+        url = "%s/users/%s" % (self.url, user_id)
+        resp = requests.get(url)
+        return User(**json.loads(resp.text))
 
     def createUser(self, name: str, email: str) -> User:
-        pass
+        url = "%s/users" % self.url
+        data = {'user': {'name': name, 'email': email}}
+        resp = requests.post(url, json=data)
+        return User(**json.loads(resp.text))
 
     def listUsers(self) -> list[User]:
-        pass
+        url = "%s/users" % self.url
+        resp = requests.get(url)
+        return list(map(lambda r: User(**r), json.loads(resp.text)))
