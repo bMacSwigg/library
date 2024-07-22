@@ -31,7 +31,10 @@ class WebBookService(BookService):
         return list(map(lambda r: Book(**r), json.loads(resp.text)))
 
     def listBooksByStatus(self, is_out) -> list[Book]:
-        pass
+        url ="%s/books" % self.url
+        params = {'is_out': int(is_out)}
+        resp = requests.get(url, params=params)
+        return list(map(lambda r: Book(**r), json.loads(resp.text)))
 
     def createBook(self, book: Book):
         pass

@@ -1,6 +1,5 @@
 from flask.testing import FlaskClient
 import json
-from threading import Thread
 import os
 import time
 import unittest
@@ -10,6 +9,7 @@ from werkzeug.test import TestResponse
 
 from library.backend.api import NotFoundException
 from library.backend.db import Database
+from library.backend.models import Action
 from library.backend.testbase import BaseTestCase
 from library.backend.web import WebBookService
 from library.config import APP_CONFIG
@@ -93,6 +93,32 @@ class TestBookService(BaseTestCase):
 
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0].title, 'Sequel')
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    def test_listBooksByStatus_checkedOut(self, _):
+        self.db.putUser(1234, 'somebody', 'email')
+        self.db.putBook('isbn-in', 'Book 1', 'Author', 'cat', 'year', 'img')
+        self.db.putBook('isbn-out', 'Book 2', 'Author', 'cat', 'year', 'img')
+        self.db.putLog('isbn-in', Action.CREATE)
+        self.db.putLog('isbn-out', Action.CHECKOUT, 1234)
+
+        res = self.bs.listBooksByStatus(True)
+
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].isbn, 'isbn-out')
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    def test_listBooksByStatus_checkedIn(self, _):
+        self.db.putUser(1234, 'somebody', 'email')
+        self.db.putBook('isbn-in', 'Book 1', 'Author', 'cat', 'year', 'img')
+        self.db.putBook('isbn-out', 'Book 2', 'Author', 'cat', 'year', 'img')
+        self.db.putLog('isbn-in', Action.CREATE)
+        self.db.putLog('isbn-out', Action.CHECKOUT, 1234)
+
+        res = self.bs.listBooksByStatus(False)
+
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].isbn, 'isbn-in')
 
 
 if __name__ == '__main__':
