@@ -9,7 +9,7 @@ from werkzeug.test import TestResponse
 
 from library.backend.api import NotFoundException
 from library.backend.db import Database
-from library.backend.models import Action
+from library.backend.models import Book, Action
 from library.backend.testbase import BaseTestCase
 from library.backend.web import WebBookService
 from library.config import APP_CONFIG
@@ -33,6 +33,10 @@ class TestClientWrapper:
             params = dict(filter(lambda kv: kv[1] is not None, params))
             url = "%s?%s" % (url, urlencode(params))
         return self.tc.get(url)
+
+    def post(self, *args, **kwargs):
+        url = args[0]
+        return self.tc.post(url, **kwargs)
 
 tcw = TestClientWrapper(app.test_client())
 
@@ -119,6 +123,16 @@ class TestBookService(BaseTestCase):
 
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0].isbn, 'isbn-in')
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_createBook(self, *_):
+        book = Book('1234', 'A Book', 'Somebody', 'cat', 'year', 'img')
+
+        self.bs.createBook(book)
+        res = self.bs.getBook('1234')
+
+        self.assertEqual(res, book)
 
 
 if __name__ == '__main__':

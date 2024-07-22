@@ -1,10 +1,6 @@
 from dataclasses import asdict
 import json
 import requests
-from urllib.error import HTTPError
-from urllib.parse import urlencode
-from urllib.request import urlopen
-# TODO: switch to requests library
 
 from library.backend.api import BookService, UserService
 from library.backend.api import NotFoundException, InvalidStateException
@@ -37,7 +33,9 @@ class WebBookService(BookService):
         return list(map(lambda r: Book(**r), json.loads(resp.text)))
 
     def createBook(self, book: Book):
-        pass
+        url = "%s/books" % self.url
+        data = {'book': asdict(book)}
+        requests.post(url, json=data)
 
     def checkoutBook(self, isbn: str, user: User):
         pass
