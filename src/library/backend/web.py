@@ -51,10 +51,14 @@ class WebBookService(BookService):
             raise InvalidStateException('Book with ISBN %s is not out' % isbn)
 
     def listBookCheckoutHistory(self, isbn: str) -> list[LogEntry]:
-        pass
+        url = "%s/books/%s/history" % (self.url, isbn)
+        resp = requests.get(url)
+        return list(map(lambda r: LogEntry(**r), json.loads(resp.text)))
 
     def listUserCheckoutHistory(self, user_id: int) -> list[LogEntry]:
-        pass
+        url = "%s/users/%s/history" % (self.url, user_id)
+        resp = requests.get(url)
+        return list(map(lambda r: LogEntry(**r), json.loads(resp.text)))
 
 class WebUserService(UserService):
 

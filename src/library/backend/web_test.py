@@ -185,6 +185,60 @@ class TestBookService(BaseTestCase):
         with self.assertRaises(InvalidStateException):
             self.bs.returnBook('isbn1')
 
+    @mock.patch('requests.get', side_effect=tcw.get)
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_listBookCheckoutHistory(self, *_):
+        self.db.putBook('isbn1', '', '', '', '', '')
+        self.db.putBook('isbn2', '', '', '', '', '')
+        user = User(1234, 'user', 'fake-email')
+        self.db.putUser(user.user_id, user.name, user.email)
+        self.bs.checkoutBook('isbn1', user)
+        time.sleep(1)
+        self.bs.returnBook('isbn1')
+        self.bs.checkoutBook('isbn2', user)
+
+        res = self.bs.listBookCheckoutHistory('isbn1')
+
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0].isbn, 'isbn1')
+        self.assertAboutNow(res[0].timestamp)
+        self.assertEqual(res[0].action, Action.CHECKOUT)
+        self.assertEqual(res[0].user_id, 1234)
+        self.assertEqual(res[0].user_name, 'user')
+        self.assertEqual(res[1].isbn, 'isbn1')
+        self.assertAboutNow(res[1].timestamp)
+        self.assertEqual(res[1].action, Action.RETURN)
+        self.assertEqual(res[1].user_id, 1234)
+        self.assertEqual(res[1].user_name, 'user')
+
+    @mock.patch('requests.get', side_effect=tcw.get)
+    @mock.patch('requests.post', side_effect=tcw.post)
+    def test_listUserCheckoutHistory(self, *_):
+        self.db.putBook('isbn1', '', '', '', '', '')
+        self.db.putBook('isbn2', '', '', '', '', '')
+        user = User(1234, 'user', 'fake-email')
+        self.db.putUser(user.user_id, user.name, user.email)
+        other = User(5678, 'other', 'fake-email')
+        self.db.putUser(other.user_id, other.name, other.email)
+        self.bs.checkoutBook('isbn1', user)
+        time.sleep(1)
+        self.bs.returnBook('isbn1')
+        self.bs.checkoutBook('isbn2', other)
+
+        res = self.bs.listUserCheckoutHistory(user.user_id)
+
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0].isbn, 'isbn1')
+        self.assertAboutNow(res[0].timestamp)
+        self.assertEqual(res[0].action, Action.CHECKOUT)
+        self.assertEqual(res[0].user_id, user.user_id)
+        self.assertEqual(res[0].user_name, 'user')
+        self.assertEqual(res[1].isbn, 'isbn1')
+        self.assertAboutNow(res[1].timestamp)
+        self.assertEqual(res[1].action, Action.RETURN)
+        self.assertEqual(res[1].user_id, user.user_id)
+        self.assertEqual(res[1].user_name, 'user')
+
 
 if __name__ == '__main__':
     unittest.main()
