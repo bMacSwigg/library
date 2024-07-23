@@ -10,6 +10,12 @@ pip install -r src\library\requirements.txt
 REM Install pyinstaller to build executables
 pip install pyinstaller
 
+SET /P OWNER=[92mWhat is your name?[0m
+REM Copy config file for changes
+MKDIR run\tmp
+COPY src\library\config.ini run\tmp\config.ini
+ECHO Owner = %OWNER% >> run\tmp\config.ini
+
 ECHO [92mDo you want to connect to a remote server?
 ECHO If yes, you will be prompted to enter a remote address.
 ECHO If no, this install will be configured for a local database.[0m
@@ -23,8 +29,6 @@ IF /I "%REMOTE%" NEQ "Y" (
 :local
 ECHO [92mConfiguring local install[0m
 REM Leave config file as-is with local db
-MKDIR run\tmp
-COPY src\library\config.ini run\tmp\config.ini
 REM Optionally create a new local DB
 SET /P MAKEDB=Do you want to initialize a blank database (Y/[N])?
 IF /I "%MAKEDB%" NEQ "Y" GOTO install
@@ -35,8 +39,6 @@ GOTO install
 :remote
 ECHO [92mConfiguring remote install[0m
 REM Edit config file to have remote address
-MKDIR run\tmp
-COPY src\library\config.ini run\tmp\config.ini
 SET /P ADDR=What is the URL of the remote server?
 ECHO RemoteBackend = %ADDR% >> run\tmp\config.ini
 GOTO install
