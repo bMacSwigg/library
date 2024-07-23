@@ -97,8 +97,9 @@ class InteractiveBookDetails(BasicBookDetails):
             checkout.grid(column=0, row=4, sticky=W, ipady=4)
             checkout.configure(style=METADATA_STYLE)
 
-    def refresh(self):
-        self.book = self.bs.getBook(self.book.isbn)
+    def refresh(self, fetchBook=True):
+        if fetchBook:
+            self.book = self.bs.getBook(self.book.isbn)
         super().refresh()
 
     def _make(self):

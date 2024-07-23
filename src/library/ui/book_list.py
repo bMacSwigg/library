@@ -38,7 +38,8 @@ class BookList:
         if showLoadingBar:
             loadingframe.destroy()
         for book in rows:
-            book.refresh()
+            # We can trust that the book instances are fresh (enough) already
+            book.refresh(fetchBook=False)
 
     def destroy(self):
         for child in self.frame.winfo_children():
