@@ -1,5 +1,5 @@
-from dataclasses import dataclass, asdict
-from enum import Enum
+from dataclasses import dataclass
+from enum import IntEnum
 
 @dataclass(frozen=True)
 class Book:
@@ -19,7 +19,7 @@ class User:
     name: str  # Full name
     email: str  # Email address for notifications
 
-class Action(Enum):
+class Action(IntEnum):
     UNKNOWN = 0
     CREATE = 1
     CHECKOUT = 2

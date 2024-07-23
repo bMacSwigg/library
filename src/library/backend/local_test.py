@@ -2,7 +2,8 @@ import os
 import unittest
 import time
 
-from library.backend.api import BookService, UserService, InvalidStateException, NotFoundException
+from library.backend.api import InvalidStateException, NotFoundException
+from library.backend.local import LocalBookService, LocalUserService
 from library.backend.db import Database
 from library.backend.models import Book, User, Action
 from library.backend.testbase import BaseTestCase
@@ -19,10 +20,10 @@ class TestBookService(BaseTestCase):
         with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)
-        self.books = BookService()
+        self.books = LocalBookService()
         self.books.db = self.db
         self.books.email = FakeEmail()
-        self.users = UserService()
+        self.users = LocalUserService()
         self.users.db = self.db
 
     def test_getBook_exists(self):
@@ -280,7 +281,7 @@ class TestUserService(BaseTestCase):
         with open(schema_path, 'r') as file:
             schema = file.read()
             self.db.con.cursor().executescript(schema)
-        self.users = UserService()
+        self.users = LocalUserService()
         self.users.db = self.db
 
     def test_getUser(self):

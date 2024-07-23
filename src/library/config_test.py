@@ -58,6 +58,13 @@ class TestConfig(unittest.TestCase):
         ac = AppConfig(override_prod=True)
         self.assertIn('library.log', ac.log_file())
 
+    def test_remotebackend_dev(self):
+        ac = AppConfig()
+        self.assertEqual(ac.remote_backend(), 'http://127.0.0.1:8080')
+
+    def test_remotebackend_prod(self):
+        ac = AppConfig(override_prod=True)
+        self.assertIsNone(ac.remote_backend())
 
 if __name__ == '__main__':
     unittest.main()

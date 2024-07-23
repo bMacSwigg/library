@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 
-from library.backend.api import BookService, LookupService
+from library.backend.api import BookService
+from library.backend.lookup import LookupService
 from library.backend.models import Book
 from library.constants import *
 from library.ui.tabs.base import BaseTab

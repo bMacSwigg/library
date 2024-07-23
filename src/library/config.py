@@ -42,5 +42,8 @@ class AppConfig:
         paths = self.config['LogPath'].split(',')
         return os.path.join(self.root, *paths)
 
+    def remote_backend(self):
+        return self.config.get('RemoteBackend')
+
 APP_CONFIG = AppConfig()
     
