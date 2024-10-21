@@ -2,7 +2,6 @@ import io
 from tkinter import *
 from tkinter import ttk
 
-from library.backend.local import LocalBookService, LocalUserService
 from library.backend.lookup import LookupService
 from library.backend.web import WebBookService, WebUserService
 from library.config import APP_CONFIG
@@ -20,12 +19,8 @@ class AppWindow:
     def __init__(self):
         self.ls = LookupService()
         self.cil = CachedImageLoader()
-        if APP_CONFIG.remote_backend() is None:
-            self.bs = LocalBookService()
-            self.us = LocalUserService()
-        else:
-            self.bs = WebBookService()
-            self.us = WebUserService()
+        self.bs = WebBookService()
+        self.us = WebUserService()
 
     def refreshCurrentTab(self, event):
         ind = self.tabs.index('current')
