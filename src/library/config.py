@@ -24,16 +24,6 @@ class AppConfig:
     def owner(self):
         return self.config['Owner']
 
-    def db_file(self):
-        paths = self.config['DbPath'].split(',')
-        return os.path.join(self.root, *paths)
-
-    def mailgun_apikey_file(self):
-        if not 'MailgunApiKeyPath' in self.config:
-            return None
-        paths = self.config['MailgunApiKeyPath'].split(',')
-        return os.path.join(self.root, *paths)
-
     def icon_file(self):
         paths = self.config['IconPath'].split(',')
         return os.path.join(self.tmp_root, *paths)
